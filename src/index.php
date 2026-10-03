@@ -6,59 +6,49 @@ require_once __DIR__ . '/bootstrap.php';
 
 use Emizh\Classes\Version;
 use Emizh\Classes\Storage;
-use Emizh\Classes\Page;
+use Emizh\Classes\Site;
 
 echo '<pre>';
 echo 'Версия: ' . Version::current() . "\n\n";
 
-Storage::ensureData();
+$site = Site::load();
 
-// 1. Загрузить все страницы
-echo "Все страницы:\n";
-$pages = Page::loadAll();
-foreach ($pages as $slug => $page) {
-    echo "  [$slug] {$page->title()} — обновлена {$page->updated()}\n";
+echo "Настройки сайта:\n";
+echo "  Название: {$site->title()}\n";
+echo "  Акцент: {$site->accentColor()}\n";
+echo "  Шрифт: {$site->font()}\n";
+echo "  Тема: {$site->theme()}\n";
+echo "  Описание: {$site->description()}\n";
+echo "  Автор: {$site->author()}\n";
+echo "  Главная: {$site->homePage()}\n";
+echo "  Порядок: " . implode(', ', $site->pageOrder()) . "\n\n";
+
+echo "Страницы в порядке:\n";
+foreach ($site->pages() as $slug => $page) {
+    echo "  [$slug] {$page->title()}\n";
 }
 echo "\n";
 
-// 2. Загрузить конкретную
-$home = Page::load('home');
-if ($home !== null) {
-    echo "Главная страница:\n";
-    echo "  Заголовок: {$home->title()}\n";
-    echo "  Слаг: {$home->slug()}\n";
-    echo "  Создана: {$home->created()}\n";
-    echo "  Обновлена: {$home->updated()}\n";
-    echo "  Первые 60 символов содержимого: " . mb_substr($home->content(), 0, 60) . "...\n\n";
-}
+$home = $site->home();
+echo "Главная страница: " . ($home ? $home->title() : '(нет)') . "\n\n";
 
-// 3. Проверка валидации слага
-echo "Проверка валидации слагов:\n";
-$tests = ['home', 'about', 'my-page', 'Home', 'with space', '../etc', 'a'];
-foreach ($tests as $test) {
-    $ok = Page::isValidSlug($test) ? '✓' : '✗';
-    echo "  $ok $test\n";
-}
-echo "\n";
+echo "Изменяем название и тему...\n";
+$site->setTitle('Emizh Demo');
+$site->setTheme('dark');
+$site->setAccentColor('#10b981');
+$site->save();
 
-// 4. Проверка slugify
-echo "Генерация слагов:\n";
-$titles = ['Моя первая страница', 'About Me', 'Привет мир', 'Hello World 123'];
-foreach ($titles as $t) {
-    echo "  \"$t\" → " . Page::slugify($t) . "\n";
-}
-echo "\n";
+echo "Перечитываем из файла:\n";
+$reloaded = Site::load();
+echo "  Название: {$reloaded->title()}\n";
+echo "  Тема: {$reloaded->theme()}\n";
+echo "  Акцент: {$reloaded->accentColor()}\n\n";
 
-// 5. Создать временную страницу, сохранить, удалить
-echo "Тест save/delete:\n";
-$test = new Page('test-page', 'Тестовая страница', "## Заголовок\n\nТекст.");
-$test->save();
-echo "  Создана: " . (Page::exists('test-page') ? 'да' : 'нет') . "\n";
-
-$loaded = Page::load('test-page');
-echo "  Загружена: " . ($loaded ? $loaded->title() : 'не загружена') . "\n";
-
-$test->delete();
-echo "  Удалена: " . (!Page::exists('test-page') ? 'да' : 'нет') . "\n";
+echo "Возвращаем как было...\n";
+$reloaded->setTitle('Мой сайт');
+$reloaded->setTheme('light');
+$reloaded->setAccentColor('#3b82f6');
+$reloaded->save();
+echo "Готово.\n";
 
 echo "</pre>";
