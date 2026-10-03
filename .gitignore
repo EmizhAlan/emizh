@@ -1,0 +1,24 @@
+# Пользовательские данные
+/data/
+/owner.json
+
+# Сборка
+/dist/
+
+# Логи
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ОС
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Временные файлы
+*.tmp
+*~

@@ -1,0 +1,21 @@
+* text=auto
+
+*.php    text
+*.js     text
+*.css    text
+*.json   text
+*.md     text
+*.svg    text
+*.html   text
+
+*.webp   binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.zip    binary
+
+CHANGELOG.md  linguist-documentation
+LICENSE       linguist-documentation
+README.md     linguist-documentation
