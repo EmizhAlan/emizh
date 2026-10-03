@@ -1,0 +1,10 @@
+{
+  "title": "Мой сайт",
+  "accentColor": "#3b82f6",
+  "font": "system-ui",
+  "theme": "light",
+  "description": "Персональный сайт на emizh",
+  "author": "",
+  "homePage": "home",
+  "pageOrder": ["home", "about"]
+}
