@@ -1,0 +1,160 @@
+/* ---------- Базовые переменные ---------- */
+
+:root {
+    --bg: #ffffff;
+    --bg-soft: #f8f9fa;
+    --text: #1f2328;
+    --text-muted: #57606a;
+    --border: #e1e4e8;
+    --accent: #3b82f6;
+    --radius: 6px;
+    --max-width: 760px;
+}
+
+[data-theme="dark"] {
+    --bg: #0d1117;
+    --bg-soft: #161b22;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --border: #30363d;
+}
+
+/* ---------- Общее ---------- */
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Шапка ---------- */
+
+.site-header {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.site-header .container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.site-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.site-title:hover {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.site-nav {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    font-size: 15px;
+    transition: color 0.15s;
+}
+
+.nav-link:hover {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.nav-link.is-active {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+/* ---------- Содержимое ---------- */
+
+.site-main {
+    padding: 48px 0 64px;
+    min-height: 50vh;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 0 24px;
+    color: var(--text);
+    line-height: 1.25;
+}
+
+.page p {
+    margin: 0 0 16px;
+}
+
+/* ---------- Временный блок для markdown ---------- */
+
+.raw-markdown {
+    font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--text);
+    margin: 0;
+}
+
+/* ---------- Подвал ---------- */
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 0;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.site-footer .container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.site-footer .version {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0.6;
+    font-family: monospace;
+}
