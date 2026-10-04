@@ -1,0 +1,26 @@
+# emizh — конфигурация Apache
+# Закрывает служебные папки от прямого доступа.
+
+# ---- Отключаем листинг директорий ----
+Options -Indexes
+
+# ---- Запрещаем доступ к служебным папкам и файлам ----
+RedirectMatch 404 ^/classes/
+RedirectMatch 404 ^/defaults/
+RedirectMatch 404 /bootstrap\.php$
+
+# ---- Отключаем показ ошибок PHP ----
+php_flag display_errors off
+php_flag log_errors on
+
+# ---- Кэширование статики ----
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/svg+xml "access plus 7 days"
+    ExpiresByType image/webp "access plus 7 days"
+</IfModule>
+
+# ---- Кодировка по умолчанию ----
+AddDefaultCharset UTF-8
