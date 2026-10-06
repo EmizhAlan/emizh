@@ -41,7 +41,7 @@ final class Markdown
     }
 
         /**
-     * Разбор текста на блоки: заголовки, списки, код, абзацы.
+     * Разбор текста на блоки: заголовки, списки, код, цитаты, абзацы.
      */
     private function parseBlocks(string $text): string
     {
@@ -51,25 +51,25 @@ final class Markdown
 
         $lines = explode("\n", $text);
         $result = [];
-        $buffer = [];        // текущий абзац (строки)
-        $listType = null;    // 'ul' | 'ol' | null
+        $buffer = [];        // текущий абзац
+        $listType = null;    // 'ul' | 'ol'
         $listItems = [];     // накопленные <li>
         $inCodeBlock = false;
         $codeLines = [];
         $codeLang = '';
+        $quoteLines = [];    // накопленные строки цитаты
 
         foreach ($lines as $line) {
-            // --- Работа с блоками кода ---
+            // --- Блок кода ---
             if (preg_match('/^```(.*)$/', $line, $m)) {
                 if (!$inCodeBlock) {
-                    // Открываем блок: закрываем абзац и список
                     $this->flushParagraph($buffer, $result);
                     $this->flushList($listType, $listItems, $result);
+                    $this->flushQuote($quoteLines, $result);
                     $inCodeBlock = true;
                     $codeLang = trim($m[1]);
                     $codeLines = [];
                 } else {
-                    // Закрываем блок: собираем <pre><code>
                     $code = implode("\n", $codeLines);
                     $langAttr = $codeLang !== ''
                         ? ' class="language-' . $codeLang . '"'
@@ -84,9 +84,21 @@ final class Markdown
             }
 
             if ($inCodeBlock) {
-                // Внутри блока кода — просто накапливаем строки
                 $codeLines[] = $line;
                 continue;
+            }
+
+            // --- Цитата ---
+            if (preg_match('/^>\s?(.*)$/', $line, $m)) {
+                $this->flushParagraph($buffer, $result);
+                $this->flushList($listType, $listItems, $result);
+                $quoteLines[] = $m[1];
+                continue;
+            }
+
+            // Закрываем цитату, если встретили что-то другое
+            if ($quoteLines !== []) {
+                $this->flushQuote($quoteLines, $result);
             }
 
             // --- Заголовок ---
@@ -125,12 +137,13 @@ final class Markdown
             $buffer[] = $line;
         }
 
-        // Если файл закончился внутри незакрытого блока кода — закрываем его
+        // Закрываем всё, что осталось открытым
         if ($inCodeBlock && $codeLines !== []) {
             $code = implode("\n", $codeLines);
             $result[] = '<pre><code>' . $code . '</code></pre>';
         }
 
+        $this->flushQuote($quoteLines, $result);
         $this->flushParagraph($buffer, $result);
         $this->flushList($listType, $listItems, $result);
 
@@ -351,5 +364,51 @@ final class Markdown
 
         $listType = null;
         $items = [];
+    }
+
+        /**
+     * Сохранить накопленную цитату в результат.
+     */
+    private function flushQuote(array &$lines, array &$result): void
+    {
+        if ($lines === []) {
+            return;
+        }
+
+        // Разбиваем цитату на абзацы по пустым строкам
+        $paragraphs = [];
+        $current = [];
+
+        foreach ($lines as $line) {
+            if (trim($line) === '') {
+                if ($current !== []) {
+                    $paragraphs[] = $current;
+                    $current = [];
+                }
+            } else {
+                $current[] = $line;
+            }
+        }
+
+        if ($current !== []) {
+            $paragraphs[] = $current;
+        }
+
+        // Если весь блок был пустой (одни `>` подряд) — ничего не выводим
+        if ($paragraphs === []) {
+            $lines = [];
+            return;
+        }
+
+        $html = '<blockquote>';
+        foreach ($paragraphs as $para) {
+            $joined = implode(' ', array_map('trim', $para));
+            $joined = $this->parseInline($joined);
+            $html .= '<p>' . $joined . '</p>';
+        }
+        $html .= '</blockquote>';
+
+        $result[] = $html;
+        $lines = [];
     }
 }
