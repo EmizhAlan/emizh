@@ -88,6 +88,15 @@ final class Markdown
                 continue;
             }
 
+            // --- Горизонтальная линия ---
+            if ($this->isHorizontalRule($line)) {
+                $this->flushParagraph($buffer, $result);
+                $this->flushList($listType, $listItems, $result);
+                $this->flushQuote($quoteLines, $result);
+                $result[] = '<hr>';
+                continue;
+            }
+
             // --- Цитата ---
             if (preg_match('/^>\s?(.*)$/', $line, $m)) {
                 $this->flushParagraph($buffer, $result);
@@ -169,6 +178,31 @@ final class Markdown
 
         $content = $this->parseInline($content);
         return "<h{$level}>{$content}</h{$level}>";
+    }
+
+        /**
+     * Проверить, является ли строка горизонтальной линией.
+     *
+     * Линия — это три или более одинаковых символа (-, *, _),
+     * возможно разделённых пробелами.
+     */
+    private function isHorizontalRule(string $line): bool
+    {
+        $trimmed = trim($line);
+
+        if ($trimmed === '') {
+            return false;
+        }
+
+        // Убираем все пробелы, чтобы `- - -` и `---` считались одинаково
+        $compact = preg_replace('/\s+/', '', $trimmed);
+
+        if (strlen($compact) < 3) {
+            return false;
+        }
+
+        // Все символы должны быть одинаковыми: - или * или _
+        return (bool) preg_match('/^(-{3,}|\*{3,}|_{3,})$/', $compact);
     }
 
     /**
