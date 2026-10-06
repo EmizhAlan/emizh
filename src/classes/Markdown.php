@@ -8,8 +8,6 @@ namespace Emizh\Classes;
  * Парсер markdown в HTML.
  *
  * Собственная реализация, без внешних библиотек.
- * На этом этапе — каркас: нормализация, экранирование HTML,
- * обёртка в абзац. Реальные правила разбора добавляются в следующих версиях.
  */
 final class Markdown
 {
@@ -20,9 +18,9 @@ final class Markdown
     {
         $text = $this->normalize($markdown);
         $text = $this->escapeHtml($text);
-        $text = $this->wrapInParagraph($text);
+        $html = $this->parseBlocks($text);
 
-        return $text;
+        return $html;
     }
 
     /**
@@ -43,17 +41,75 @@ final class Markdown
     }
 
     /**
-     * Обернуть текст в абзац.
-     *
-     * Временная реализация — весь текст в один <p>.
-     * Заменится на полноценный разбор по строкам в следующих версиях.
+     * Разбор текста на блоки: заголовки, абзацы.
      */
-    private function wrapInParagraph(string $text): string
+    private function parseBlocks(string $text): string
     {
         if ($text === '') {
             return '';
         }
 
-        return '<p>' . $text . '</p>';
+        $lines = explode("\n", $text);
+        $result = [];
+        $paragraphBuffer = [];
+
+        foreach ($lines as $line) {
+            $heading = $this->parseHeading($line);
+
+            if ($heading !== null) {
+                // Прежде чем начать заголовок, выгружаем накопленный абзац
+                $this->flushParagraph($paragraphBuffer, $result);
+                $result[] = $heading;
+                continue;
+            }
+
+            // Пустая строка — тоже выгружаем абзац
+            if (trim($line) === '') {
+                $this->flushParagraph($paragraphBuffer, $result);
+                continue;
+            }
+
+            $paragraphBuffer[] = $line;
+        }
+
+        // Не забываем выгрузить остаток
+        $this->flushParagraph($paragraphBuffer, $result);
+
+        return implode("\n", $result);
+    }
+
+    /**
+     * Распознать заголовок в строке.
+     * Возвращает HTML или null, если это не заголовок.
+     */
+    private function parseHeading(string $line): ?string
+    {
+        if (!preg_match('/^(#{1,6})\s+(.+)$/', $line, $matches)) {
+            return null;
+        }
+
+        $level = strlen($matches[1]);
+        $content = trim($matches[2]);
+
+        if ($content === '') {
+            return null;
+        }
+
+        return "<h{$level}>{$content}</h{$level}>";
+    }
+
+    /**
+     * Сохранить накопленный абзац в результат.
+     * Если буфер пуст — ничего не делает.
+     */
+    private function flushParagraph(array &$buffer, array &$result): void
+    {
+        if ($buffer === []) {
+            return;
+        }
+
+        $joined = implode(' ', array_map('trim', $buffer));
+        $result[] = '<p>' . $joined . '</p>';
+        $buffer = [];
     }
 }
