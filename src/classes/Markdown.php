@@ -108,8 +108,41 @@ final class Markdown
             return;
         }
 
-        $joined = implode(' ', array_map('trim', $buffer));
-        $result[] = '<p>' . $joined . '</p>';
+        $result[] = $this->buildParagraph($buffer);
         $buffer = [];
+    }
+
+    /**
+     * Собрать абзац из строк буфера с учётом принудительных переносов.
+     */
+    private function buildParagraph(array $lines): string
+    {
+        $parts = [];
+
+        foreach ($lines as $line) {
+            $trailing = rtrim($line, "\n"); // уже без \n
+
+            // Проверяем: заканчивается ли строка двумя и более пробелами
+            if (preg_match('/ {2,}$/', $line)) {
+                // Обрезаем пробелы и добавляем <br>
+                $parts[] = rtrim($line) . '<br>';
+            } else {
+                $parts[] = trim($line);
+            }
+        }
+
+        // Соединяем части: если предыдущая уже содержит <br> — пробел не нужен
+        $joined = '';
+        foreach ($parts as $i => $part) {
+            if ($i > 0) {
+                $prev = $parts[$i - 1];
+                if (!str_ends_with($prev, '<br>')) {
+                    $joined .= ' ';
+                }
+            }
+            $joined .= $part;
+        }
+
+        return '<p>' . $joined . '</p>';
     }
 }
