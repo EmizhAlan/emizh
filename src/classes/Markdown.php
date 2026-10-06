@@ -95,6 +95,7 @@ final class Markdown
             return null;
         }
 
+        $content = $this->parseInline($content);
         return "<h{$level}>{$content}</h{$level}>";
     }
 
@@ -120,18 +121,17 @@ final class Markdown
         $parts = [];
 
         foreach ($lines as $line) {
-            $trailing = rtrim($line, "\n"); // уже без \n
-
+            $line = trim($line);
+        
             // Проверяем: заканчивается ли строка двумя и более пробелами
             if (preg_match('/ {2,}$/', $line)) {
-                // Обрезаем пробелы и добавляем <br>
                 $parts[] = rtrim($line) . '<br>';
             } else {
-                $parts[] = trim($line);
+                $parts[] = $line;
             }
         }
 
-        // Соединяем части: если предыдущая уже содержит <br> — пробел не нужен
+        // Соединяем части и применяем инлайн-разметку
         $joined = '';
         foreach ($parts as $i => $part) {
             if ($i > 0) {
@@ -142,7 +142,40 @@ final class Markdown
             }
             $joined .= $part;
         }
-
+        
+        $joined = $this->parseInline($joined);
+        
         return '<p>' . $joined . '</p>';
+    }
+
+        /**
+     * Разбор внутристрочной разметки: жирный, курсив, код.
+     *
+     * Порядок важен: сначала обрабатываем **, потом *, потом `.
+     */
+    private function parseInline(string $text): string
+    {
+        // Жирный: **текст**
+        $text = preg_replace(
+            '/\*\*(.+?)\*\*/s',
+            '<strong>$1</strong>',
+            $text
+        );
+
+        // Курсив: *текст*
+        $text = preg_replace(
+            '/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s',
+            '<em>$1</em>',
+            $text
+        );
+
+        // Инлайн-код: `текст`
+        $text = preg_replace(
+            '/`([^`]+)`/',
+            '<code>$1</code>',
+            $text
+        );
+
+        return $text;
     }
 }
