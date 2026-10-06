@@ -41,8 +41,8 @@ final class Markdown
     }
 
     /**
-     * Разбор текста на блоки: заголовки, абзацы.
-     */
+    * Разбор текста на блоки: заголовки, списки, абзацы.
+    */
     private function parseBlocks(string $text): string
     {
         if ($text === '') {
@@ -51,29 +51,50 @@ final class Markdown
 
         $lines = explode("\n", $text);
         $result = [];
-        $paragraphBuffer = [];
+        $buffer = [];       // текущий абзац (строки)
+        $listType = null;   // 'ul' | 'ol' | null
+        $listItems = [];    // накопленные <li>
 
         foreach ($lines as $line) {
             $heading = $this->parseHeading($line);
 
             if ($heading !== null) {
-                // Прежде чем начать заголовок, выгружаем накопленный абзац
-                $this->flushParagraph($paragraphBuffer, $result);
+                $this->flushParagraph($buffer, $result);
+                $this->flushList($listType, $listItems, $result);
                 $result[] = $heading;
                 continue;
             }
 
-            // Пустая строка — тоже выгружаем абзац
-            if (trim($line) === '') {
-                $this->flushParagraph($paragraphBuffer, $result);
+            $listMatch = $this->parseListItem($line);
+
+            if ($listMatch !== null) {
+                // Если тип списка сменился — закрываем предыдущий
+                if ($listType !== null && $listType !== $listMatch['type']) {
+                    $this->flushParagraph($buffer, $result);
+                    $this->flushList($listType, $listItems, $result);
+                }
+                $this->flushParagraph($buffer, $result);
+                $listType = $listMatch['type'];
+                $listItems[] = $listMatch['content'];
                 continue;
             }
 
-            $paragraphBuffer[] = $line;
+            // Пустая строка — закрываем всё накопленное
+            if (trim($line) === '') {
+                $this->flushParagraph($buffer, $result);
+                $this->flushList($listType, $listItems, $result);
+                continue;
+            }
+
+            // Обычная строка — если открыт список, значит список закончился
+            if ($listType !== null) {
+                $this->flushList($listType, $listItems, $result);
+            }
+            $buffer[] = $line;
         }
 
-        // Не забываем выгрузить остаток
-        $this->flushParagraph($paragraphBuffer, $result);
+        $this->flushParagraph($buffer, $result);
+        $this->flushList($listType, $listItems, $result);
 
         return implode("\n", $result);
     }
@@ -243,5 +264,54 @@ final class Markdown
     private function isExternalUrl(string $url): bool
     {
         return str_starts_with($url, 'http://') || str_starts_with($url, 'https://');
+    }
+
+        /**
+     * Распознать пункт списка в строке.
+     * Возвращает ['type' => 'ul'|'ol', 'content' => string] или null.
+     */
+    private function parseListItem(string $line): ?array
+    {
+        // Нумерованный: 1. текст
+        if (preg_match('/^\s*\d+\.\s+(.+)$/', $line, $m)) {
+            return [
+                'type' => 'ol',
+                'content' => trim($m[1]),
+            ];
+        }
+
+        // Маркированный: - текст, * текст, + текст
+        if (preg_match('/^\s*[-*+]\s+(.+)$/', $line, $m)) {
+            return [
+                'type' => 'ul',
+                'content' => trim($m[1]),
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * Сохранить накопленный список в результат.
+     */
+    private function flushList(?string &$listType, array &$items, array &$result): void
+    {
+        if ($listType === null || $items === []) {
+            $listType = null;
+            $items = [];
+            return;
+        }
+
+        $html = "<{$listType}>";
+        foreach ($items as $item) {
+            $item = $this->parseInline($item);
+            $html .= "<li>{$item}</li>";
+        }
+        $html .= "</{$listType}>";
+
+        $result[] = $html;
+
+        $listType = null;
+        $items = [];
     }
 }

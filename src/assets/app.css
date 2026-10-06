@@ -187,6 +187,28 @@ a:hover {
     border-bottom-color: var(--accent);
 }
 
+.markdown ul,
+.markdown ol {
+    margin: 0 0 16px;
+    padding-left: 28px;
+}
+
+.markdown li {
+    margin-bottom: 6px;
+}
+
+.markdown li:last-child {
+    margin-bottom: 0;
+}
+
+.markdown ul li::marker {
+    color: var(--text-muted);
+}
+
+.markdown ol li::marker {
+    color: var(--text-muted);
+}
+
 /* ---------- Подвал ---------- */
 
 .site-footer {
