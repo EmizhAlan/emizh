@@ -120,20 +120,19 @@ a:hover {
     margin: 0 0 16px;
 }
 
-/* ---------- Временный блок для markdown ---------- */
+/* ---------- Markdown ---------- */
 
-.raw-markdown {
-    font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 14px;
-    line-height: 1.6;
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    color: var(--text);
-    margin: 0;
+.markdown {
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.markdown p {
+    margin: 0 0 16px;
+}
+
+.markdown p:last-child {
+    margin-bottom: 0;
 }
 
 /* ---------- Подвал ---------- */

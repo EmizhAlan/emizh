@@ -7,6 +7,7 @@ require_once __DIR__ . '/bootstrap.php';
 use Emizh\Classes\Version;
 use Emizh\Classes\Site;
 use Emizh\Classes\Page;
+use Emizh\Classes\Markdown;
 
 /**
  * Экранирование для безопасного вывода в HTML.
@@ -21,6 +22,7 @@ $site = Site::load();
 
 // ---- Определяем, какую страницу показывать ----
 $requestedSlug = isset($_GET['page']) ? (string) $_GET['page'] : '';
+$markdown = new Markdown();
 $page = null;
 $notFound = false;
 
@@ -109,7 +111,9 @@ $font        = $site->font();
 
             <article class="page">
                 <h1 class="page-title"><?= e($page->title()) ?></h1>
-                <pre class="raw-markdown"><?= e($page->content()) ?></pre>
+                <div class="markdown">
+                    <?= $markdown->render($page->content()) ?>
+                </div>
             </article>
 
         <?php endif; ?>
