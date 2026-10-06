@@ -148,13 +148,16 @@ final class Markdown
         return '<p>' . $joined . '</p>';
     }
 
-        /**
-     * Разбор внутристрочной разметки: жирный, курсив, код.
+     /**
+     * Разбор внутристрочной разметки: ссылки, жирный, курсив, код.
      *
-     * Порядок важен: сначала обрабатываем **, потом *, потом `.
+     * Порядок важен: сначала ссылки, потом ** , потом * , потом ` .
      */
     private function parseInline(string $text): string
     {
+        // Ссылки: [текст](url)
+        $text = $this->parseLinks($text);
+
         // Жирный: **текст**
         $text = preg_replace(
             '/\*\*(.+?)\*\*/s',
@@ -177,5 +180,68 @@ final class Markdown
         );
 
         return $text;
+    }
+
+    /**
+     * Разбор ссылок [текст](url).
+     */
+    private function parseLinks(string $text): string
+    {
+        return preg_replace_callback(
+            '/\[([^\]]+)\]\(([^)]+)\)/',
+            function (array $m): string {
+                $label = $m[1];
+                $url = $this->sanitizeUrl($m[2]);
+
+                $external = $this->isExternalUrl($url);
+                $attrs = $external
+                    ? ' target="_blank" rel="noopener noreferrer"'
+                    : '';
+
+                return '<a href="' . $url . '"' . $attrs . '>' . $label . '</a>';
+            },
+            $text
+        );
+    }
+
+    /**
+     * Проверка и нормализация URL.
+     * Разрешаем только безопасные схемы.
+     */
+    private function sanitizeUrl(string $url): string
+    {
+        $url = trim($url);
+
+        // Уже экранировано выше, но на всякий случай
+        if ($url === '') {
+            return '#';
+        }
+
+        // Разрешённые схемы и относительные ссылки
+        $allowed = [
+            '#',
+            '/',
+            'http://',
+            'https://',
+            'mailto:',
+            'tel:',
+        ];
+
+        foreach ($allowed as $prefix) {
+            if (str_starts_with($url, $prefix)) {
+                return $url;
+            }
+        }
+
+        // Всё остальное — блокируем
+        return '#';
+    }
+
+    /**
+     * Является ли URL внешним (ведёт на другой сайт).
+     */
+    private function isExternalUrl(string $url): bool
+    {
+        return str_starts_with($url, 'http://') || str_starts_with($url, 'https://');
     }
 }
