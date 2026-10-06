@@ -40,9 +40,9 @@ final class Markdown
         return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
-    /**
-    * Разбор текста на блоки: заголовки, списки, абзацы.
-    */
+        /**
+     * Разбор текста на блоки: заголовки, списки, код, абзацы.
+     */
     private function parseBlocks(string $text): string
     {
         if ($text === '') {
@@ -51,13 +51,46 @@ final class Markdown
 
         $lines = explode("\n", $text);
         $result = [];
-        $buffer = [];       // текущий абзац (строки)
-        $listType = null;   // 'ul' | 'ol' | null
-        $listItems = [];    // накопленные <li>
+        $buffer = [];        // текущий абзац (строки)
+        $listType = null;    // 'ul' | 'ol' | null
+        $listItems = [];     // накопленные <li>
+        $inCodeBlock = false;
+        $codeLines = [];
+        $codeLang = '';
 
         foreach ($lines as $line) {
-            $heading = $this->parseHeading($line);
+            // --- Работа с блоками кода ---
+            if (preg_match('/^```(.*)$/', $line, $m)) {
+                if (!$inCodeBlock) {
+                    // Открываем блок: закрываем абзац и список
+                    $this->flushParagraph($buffer, $result);
+                    $this->flushList($listType, $listItems, $result);
+                    $inCodeBlock = true;
+                    $codeLang = trim($m[1]);
+                    $codeLines = [];
+                } else {
+                    // Закрываем блок: собираем <pre><code>
+                    $code = implode("\n", $codeLines);
+                    $langAttr = $codeLang !== ''
+                        ? ' class="language-' . $codeLang . '"'
+                        : '';
+                    $result[] = '<pre><code' . $langAttr . '>'
+                        . $code . '</code></pre>';
+                    $inCodeBlock = false;
+                    $codeLang = '';
+                    $codeLines = [];
+                }
+                continue;
+            }
 
+            if ($inCodeBlock) {
+                // Внутри блока кода — просто накапливаем строки
+                $codeLines[] = $line;
+                continue;
+            }
+
+            // --- Заголовок ---
+            $heading = $this->parseHeading($line);
             if ($heading !== null) {
                 $this->flushParagraph($buffer, $result);
                 $this->flushList($listType, $listItems, $result);
@@ -65,10 +98,9 @@ final class Markdown
                 continue;
             }
 
+            // --- Пункт списка ---
             $listMatch = $this->parseListItem($line);
-
             if ($listMatch !== null) {
-                // Если тип списка сменился — закрываем предыдущий
                 if ($listType !== null && $listType !== $listMatch['type']) {
                     $this->flushParagraph($buffer, $result);
                     $this->flushList($listType, $listItems, $result);
@@ -79,18 +111,24 @@ final class Markdown
                 continue;
             }
 
-            // Пустая строка — закрываем всё накопленное
+            // --- Пустая строка ---
             if (trim($line) === '') {
                 $this->flushParagraph($buffer, $result);
                 $this->flushList($listType, $listItems, $result);
                 continue;
             }
 
-            // Обычная строка — если открыт список, значит список закончился
+            // --- Обычная строка ---
             if ($listType !== null) {
                 $this->flushList($listType, $listItems, $result);
             }
             $buffer[] = $line;
+        }
+
+        // Если файл закончился внутри незакрытого блока кода — закрываем его
+        if ($inCodeBlock && $codeLines !== []) {
+            $code = implode("\n", $codeLines);
+            $result[] = '<pre><code>' . $code . '</code></pre>';
         }
 
         $this->flushParagraph($buffer, $result);
