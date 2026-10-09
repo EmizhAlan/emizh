@@ -256,4 +256,133 @@ final class Auth
             throw new RuntimeException('Не удалось переименовать owner.json');
         }
     }
+
+    // ---------- Сессии ----------
+
+    /**
+     * Запустить сессию с безопасными настройками.
+     * Безопасно вызывать повторно — если сессия уже идёт, ничего не делает.
+     */
+    public static function startSession(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return;
+        }
+
+        // Безопасные параметры cookie ДО session_start
+        $secure = self::isHttps();
+
+        session_set_cookie_params([
+            'lifetime' => 0,           // до закрытия браузера
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => $secure,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+        session_name('emizh_session');
+        session_start();
+    }
+
+    /**
+     * Попытка входа. При успехе записывает данные в сессию.
+     */
+    public static function login(string $username, string $password): bool
+    {
+        self::startSession();
+
+        if (!self::verify($username, $password)) {
+            return false;
+        }
+
+        // Защита от фиксации сессии
+        session_regenerate_id(true);
+
+        $_SESSION['user'] = $username;
+        $_SESSION['logged_in_at'] = time();
+
+        return true;
+    }
+
+    /**
+     * Выход из сессии.
+     */
+    public static function logout(): void
+    {
+        self::startSession();
+
+        $_SESSION = [];
+
+        // Удаляем cookie сессии
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                [
+                    'expires'  => time() - 42000,
+                    'path'     => $params['path'],
+                    'domain'   => $params['domain'],
+                    'secure'   => $params['secure'],
+                    'httponly' => $params['httponly'],
+                    'samesite' => $params['samesite'] ?? 'Lax',
+                ]
+            );
+        }
+
+        session_destroy();
+    }
+
+    /**
+     * Залогинен ли сейчас кто-нибудь.
+     */
+    public static function isLoggedIn(): bool
+    {
+        self::startSession();
+
+        if (empty($_SESSION['user'])) {
+            return false;
+        }
+
+        // Проверяем, что такой владелец ещё существует
+        $owner = self::read();
+        if ($owner === null) {
+            return false;
+        }
+
+        return hash_equals($owner['username'], $_SESSION['user']);
+    }
+
+    /**
+     * Имя текущего залогиненного пользователя.
+     */
+    public static function currentUser(): ?string
+    {
+        if (!self::isLoggedIn()) {
+            return null;
+        }
+        return $_SESSION['user'];
+    }
+
+    /**
+     * Определить, работает ли сайт по HTTPS.
+     */
+    private static function isHttps(): bool
+    {
+        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            return true;
+        }
+
+        if (($_SERVER['SERVER_PORT'] ?? null) == 443) {
+            return true;
+        }
+
+        // Учитываем случай, когда сайт за прокси
+        if (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null) === 'https') {
+            return true;
+        }
+
+        return false;
+    }
 }

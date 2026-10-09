@@ -134,33 +134,3 @@ $font        = $site->font();
 
 </body>
 </html>
-
-<?php
-// ВРЕМЕННЫЙ БЛОК — удалить после проверки
-if (isset($_GET['test_auth'])) {
-    echo '<pre style="background:#f4f4f4;padding:20px;margin:20px;">';
-    echo "ownerExists: " . (Auth::ownerExists() ? 'да' : 'нет') . "\n";
-    echo "ownerFilePath: " . Auth::ownerFilePath() . "\n\n";
-
-    if (!Auth::ownerExists()) {
-        echo "Создаём тестового владельца...\n";
-        Auth::createOwner('admin', 'secret123');
-        echo "Создан.\n\n";
-    }
-
-    echo "Проверка логина/пароля:\n";
-    echo "  admin/secret123: " . (Auth::verify('admin', 'secret123') ? '✓' : '✗') . "\n";
-    echo "  admin/wrong:     " . (Auth::verify('admin', 'wrong') ? '✓' : '✗') . "\n";
-    echo "  baduser/secret:  " . (Auth::verify('baduser', 'secret123') ? '✓' : '✗') . "\n\n";
-
-    echo "username: " . (Auth::username() ?? '(нет)') . "\n";
-    echo "secret: " . substr(Auth::secret() ?? '', 0, 16) . "...\n\n";
-
-    echo "Проверка валидации логинов:\n";
-    foreach (['admin', 'ab', 'user_name', 'user name', 'кириллица', str_repeat('a', 40)] as $u) {
-        echo "  " . (Auth::isValidUsername($u) ? '✓' : '✗') . " " . $u . "\n";
-    }
-
-    echo '</pre>';
-    exit;
-}
