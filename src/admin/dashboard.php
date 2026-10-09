@@ -30,6 +30,7 @@ $username = Auth::currentUser();
         <div class="admin-topbar-user">
             <?= htmlspecialchars((string)$username, ENT_QUOTES, 'UTF-8') ?>
             <form method="post" action="logout.php" style="display:inline">
+                <?= csrfField() ?>
                 <button type="submit" class="admin-btn admin-btn-small admin-btn-secondary">Выйти</button>
             </form>
         </div>

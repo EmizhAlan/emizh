@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../bootstrap.php';
 
 use Emizh\Classes\Auth;
+use Emizh\Classes\Csrf;
 
 Auth::startSession();
 
@@ -23,4 +24,9 @@ function adminRedirect(string $path = './'): never
 function isPost(): bool
 {
     return ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST';
+}
+
+function csrfField(): string
+{
+    return Csrf::field();
 }

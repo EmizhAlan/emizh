@@ -302,6 +302,9 @@ final class Auth
         $_SESSION['user'] = $username;
         $_SESSION['logged_in_at'] = time();
 
+        // Обновляем CSRF-токен после входа
+        \Emizh\Classes\Csrf::rotate();
+
         return true;
     }
 

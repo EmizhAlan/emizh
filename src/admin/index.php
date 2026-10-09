@@ -39,6 +39,7 @@ $username = Auth::currentUser();
             <p class="admin-subtitle">Создайте владельца сайта. Логин и пароль сохранятся навсегда — их нельзя будет изменить через панель управления.</p>
 
             <form method="post" action="register.php" class="admin-form">
+                <?= csrfField() ?>
                 <label class="admin-label">
                     <span>Логин</span>
                     <input type="text" name="username" required minlength="3" maxlength="32" autocomplete="username" autofocus>
@@ -65,6 +66,7 @@ $username = Auth::currentUser();
             <p class="admin-subtitle">Введите логин и пароль владельца сайта.</p>
 
             <form method="post" action="login.php" class="admin-form">
+                <?= csrfField() ?>
                 <label class="admin-label">
                     <span>Логин</span>
                     <input type="text" name="username" required autocomplete="username" autofocus>
@@ -90,6 +92,7 @@ $username = Auth::currentUser();
             <p>Редактирование страниц будет добавлено в следующей версии.</p>
 
             <form method="post" action="logout.php" class="admin-form-inline">
+                <?= csrfField() ?>
                 <a href="../" class="admin-btn admin-btn-secondary">На сайт</a>
                 <a href="dashboard.php" class="admin-btn">Открыть панель</a>
             </form>
