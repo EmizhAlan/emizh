@@ -385,4 +385,44 @@ final class Auth
 
         return false;
     }
+
+        // ---------- Защита ----------
+
+    /**
+     * Требовать вход. Если не залогинен — редирект на главную админки.
+     * После вызова можно смело работать с $user = Auth::currentUser().
+     */
+    public static function requireLogin(string $adminBase = '/admin/'): void
+    {
+        self::startSession();
+
+        if (self::isLoggedIn()) {
+            return;
+        }
+
+        $_SESSION['flash_error'] = 'Требуется вход.';
+        self::redirect($adminBase);
+    }
+
+    /**
+     * Требовать наличие владельца.
+     * Используется на страницах, которые бессмысленны до регистрации.
+     */
+    public static function requireOwner(string $adminBase = '/admin/'): void
+    {
+        if (self::ownerExists()) {
+            return;
+        }
+
+        self::redirect($adminBase);
+    }
+
+    /**
+     * Редирект и выход.
+     */
+    public static function redirect(string $url): void
+    {
+        header('Location: ' . $url);
+        exit;
+    }
 }

@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/_init.php';
 
 use Emizh\Classes\Auth;
 
 Auth::logout();
-
-header('Location: ./');
-exit;
+adminRedirect('./');

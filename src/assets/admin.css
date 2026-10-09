@@ -147,3 +147,48 @@
     font-size: 12px;
     color: #999;
 }
+
+/* ---------- Широкая админка (для защищённых страниц) ---------- */
+
+.admin-container-wide {
+    max-width: 900px;
+}
+
+.admin-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px 0;
+}
+
+.admin-topbar-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.admin-topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #666;
+}
+
+.admin-btn-small {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* ---------- Дополнительные правила ---------- */
+
+.admin-card code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background: #f4f4f4;
+    border: 1px solid #e0e0e0;
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: #333;
+}

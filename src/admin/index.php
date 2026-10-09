@@ -2,16 +2,10 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/_init.php';
 
 use Emizh\Classes\Auth;
 use Emizh\Classes\Version;
-
-Auth::startSession();
-
-$error = $_SESSION['flash_error'] ?? null;
-$success = $_SESSION['flash_success'] ?? null;
-unset($_SESSION['flash_error'], $_SESSION['flash_success']);
 
 $ownerExists = Auth::ownerExists();
 $loggedIn = Auth::isLoggedIn();
@@ -30,17 +24,16 @@ $username = Auth::currentUser();
 
 <div class="admin-container">
 
-    <?php if ($error !== null): ?>
-        <div class="admin-alert admin-alert-error"><?= htmlspecialchars((string)$error, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php if ($flashError !== null): ?>
+        <div class="admin-alert admin-alert-error"><?= htmlspecialchars((string)$flashError, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
 
-    <?php if ($success !== null): ?>
-        <div class="admin-alert admin-alert-success"><?= htmlspecialchars((string)$success, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php if ($flashSuccess !== null): ?>
+        <div class="admin-alert admin-alert-success"><?= htmlspecialchars((string)$flashSuccess, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
 
     <?php if (!$ownerExists): ?>
 
-        <!-- Регистрация -->
         <div class="admin-card">
             <h1 class="admin-title">Первый запуск</h1>
             <p class="admin-subtitle">Создайте владельца сайта. Логин и пароль сохранятся навсегда — их нельзя будет изменить через панель управления.</p>
@@ -67,7 +60,6 @@ $username = Auth::currentUser();
 
     <?php elseif (!$loggedIn): ?>
 
-        <!-- Вход -->
         <div class="admin-card">
             <h1 class="admin-title">Вход в админку</h1>
             <p class="admin-subtitle">Введите логин и пароль владельца сайта.</p>
@@ -89,7 +81,6 @@ $username = Auth::currentUser();
 
     <?php else: ?>
 
-        <!-- Залогинен — заглушка -->
         <div class="admin-card">
             <h1 class="admin-title">Вы вошли</h1>
             <p class="admin-subtitle">
@@ -100,7 +91,7 @@ $username = Auth::currentUser();
 
             <form method="post" action="logout.php" class="admin-form-inline">
                 <a href="../" class="admin-btn admin-btn-secondary">На сайт</a>
-                <button type="submit" class="admin-btn">Выйти</button>
+                <a href="dashboard.php" class="admin-btn">Открыть панель</a>
             </form>
         </div>
 
