@@ -6,6 +6,7 @@ require_once __DIR__ . '/_init.php';
 
 use Emizh\Classes\Auth;
 use Emizh\Classes\Csrf;
+use Emizh\Classes\RateLimit;
 
 if (!isPost()) {
     adminRedirect('./');
@@ -40,6 +41,10 @@ try {
 }
 
 Auth::login($username, $password);
+
+// Сбрасываем rate limit для логина
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+RateLimit::clear('login:' . $ip . ':' . mb_strtolower($username));
 
 $_SESSION['flash_success'] = 'Владелец создан. Добро пожаловать!';
 adminRedirect('./');

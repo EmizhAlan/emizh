@@ -149,4 +149,25 @@ final class RateLimit
         @chmod($tmp, 0600);
         @rename($tmp, $path);
     }
+
+        /**
+     * Текущее количество попыток в окне.
+     */
+    public static function currentAttempts(string $key): int
+    {
+        $data = self::load();
+        $now = time();
+        $key = self::key($key);
+
+        if (!isset($data[$key]['attempts'])) {
+            return 0;
+        }
+
+        $attempts = array_filter(
+            $data[$key]['attempts'],
+            fn($t) => ($now - $t) < self::WINDOW_SECONDS
+        );
+
+        return count($attempts);
+    }
 }

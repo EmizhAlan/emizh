@@ -151,6 +151,7 @@ final class Auth
 
         $owner['passwordHash'] = self::hashPassword($newPassword);
         $owner['updated'] = date('c');
+        $owner['secret'] = self::generateSecret();
 
         self::writeFile($owner);
         return true;
@@ -305,6 +306,7 @@ final class Auth
         $_SESSION['user'] = $username;
         $_SESSION['logged_in_at'] = time();
         $_SESSION['last_activity'] = time();
+        $_SESSION['secret_check'] = self::secret();
 
         // Обновляем CSRF-токен после входа
         \Emizh\Classes\Csrf::rotate();
@@ -352,13 +354,24 @@ final class Auth
             return false;
         }
 
-        // Проверяем, что такой владелец ещё существует
         $owner = self::read();
         if ($owner === null) {
             return false;
         }
 
-        return hash_equals($owner['username'], $_SESSION['user']);
+        if (!hash_equals($owner['username'], $_SESSION['user'])) {
+            return false;
+        }
+
+        // Проверяем, что сессия была создана с текущим секретом
+        // Если секрет менялся — сессия становится невалидной
+        if (!empty($_SESSION['secret_check'])) {
+            if (!hash_equals($owner['secret'], $_SESSION['secret_check'])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
