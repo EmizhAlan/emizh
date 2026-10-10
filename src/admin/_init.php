@@ -8,6 +8,7 @@ use Emizh\Classes\Auth;
 use Emizh\Classes\Csrf;
 
 Auth::startSession();
+Auth::touchSession();
 
 // Забираем flash-сообщения и сразу чистим
 $flashError = $_SESSION['flash_error'] ?? null;

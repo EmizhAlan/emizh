@@ -32,5 +32,7 @@ if (!Auth::login($username, $password)) {
     adminRedirect('./');
 }
 
+RateLimit::clear($rateKey);
+
 $_SESSION['flash_success'] = 'Вы вошли в админку.';
 adminRedirect('./');

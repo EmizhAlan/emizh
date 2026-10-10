@@ -14,6 +14,7 @@ final class Csrf
     private const SESSION_KEY = '_csrf_token';
     private const FIELD_NAME = '_csrf';
     private const TOKEN_BYTES = 32;
+    private const ROTATE_INTERVAL = 900; // 15 минут
 
     /**
      * Получить текущий токен. Если его нет — создать.
@@ -22,8 +23,15 @@ final class Csrf
     {
         Auth::startSession();
 
-        if (empty($_SESSION[self::SESSION_KEY])) {
+        $lastRotate = $_SESSION['_csrf_rotated_at'] ?? 0;
+
+        // Если токена нет или прошло больше ROTATE_INTERVAL — создаём новый
+        if (
+            empty($_SESSION[self::SESSION_KEY]) ||
+            (time() - $lastRotate) > self::ROTATE_INTERVAL
+        ) {
             $_SESSION[self::SESSION_KEY] = bin2hex(random_bytes(self::TOKEN_BYTES));
+            $_SESSION['_csrf_rotated_at'] = time();
         }
 
         return $_SESSION[self::SESSION_KEY];
@@ -93,5 +101,6 @@ final class Csrf
     {
         Auth::startSession();
         $_SESSION[self::SESSION_KEY] = bin2hex(random_bytes(self::TOKEN_BYTES));
+        $_SESSION['_csrf_rotated_at'] = time();
     }
 }

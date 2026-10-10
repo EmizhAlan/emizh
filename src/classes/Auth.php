@@ -21,6 +21,9 @@ final class Auth
     private const USERNAME_MAX = 32;
     private const PASSWORD_MIN = 6;
 
+    private const SESSION_TIMEOUT = 1800;  // 30 минут в секундах
+    private const SESSION_WARNING = 600;   // за 10 минут до истечения можно показать предупреждение (пока не используется)
+
     /**
      * Абсолютный путь к файлу owner.json.
      * Лежит рядом с data/, то есть на уровень выше корня сайта.
@@ -301,6 +304,7 @@ final class Auth
 
         $_SESSION['user'] = $username;
         $_SESSION['logged_in_at'] = time();
+        $_SESSION['last_activity'] = time();
 
         // Обновляем CSRF-токен после входа
         \Emizh\Classes\Csrf::rotate();
@@ -427,5 +431,45 @@ final class Auth
     {
         header('Location: ' . $url);
         exit;
+    }
+
+        /**
+     * Обновить время последней активности. Вызывать на каждой админской странице.
+     * Если прошло больше SESSION_TIMEOUT — разлогинить.
+     */
+    public static function touchSession(): void
+    {
+        self::startSession();
+
+        if (empty($_SESSION['user'])) {
+            return;
+        }
+
+        $last = $_SESSION['last_activity'] ?? 0;
+
+        if ($last > 0 && (time() - $last) > self::SESSION_TIMEOUT) {
+            // Сессия истекла — принудительный выход
+            self::logout();
+            self::startSession();
+            $_SESSION['flash_error'] = 'Сессия истекла. Войдите снова.';
+            return;
+        }
+
+        $_SESSION['last_activity'] = time();
+    }
+
+    /**
+     * Проверить: истекла ли текущая сессия по времени.
+     */
+    public static function isSessionExpired(): bool
+    {
+        self::startSession();
+
+        $last = $_SESSION['last_activity'] ?? 0;
+        if ($last === 0) {
+            return false;
+        }
+
+        return (time() - $last) > self::SESSION_TIMEOUT;
     }
 }
