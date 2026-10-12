@@ -27,10 +27,23 @@ if ($username === '' || $password === '') {
 }
 
 if (!Auth::login($username, $password)) {
+    RateLimit::hit($rateKey);
+    $wait = RateLimit::secondsUntilRetry($rateKey);
+    if ($wait > 0) {
+        $_SESSION['_rate_hint'] = ['until' => time() + $wait];
+    }
     sleep(1);
     $_SESSION['flash_error'] = 'Неверный логин или пароль.';
     adminRedirect('./');
 }
+
+if (!RateLimit::check($rateKey)) {
+    $wait = RateLimit::secondsUntilRetry($rateKey);
+    $_SESSION['_rate_hint'] = ['until' => time() + $wait];
+    adminRedirect('./');
+}
+
+unset($_SESSION['_rate_hint']);
 
 RateLimit::clear($rateKey);
 

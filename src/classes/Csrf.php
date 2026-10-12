@@ -100,7 +100,15 @@ final class Csrf
     public static function rotate(): void
     {
         Auth::startSession();
-        $_SESSION[self::SESSION_KEY] = bin2hex(random_bytes(self::TOKEN_BYTES));
+
+        $old = $_SESSION[self::SESSION_KEY] ?? '';
+
+        // Гарантируем, что новый токен отличается от старого
+        do {
+            $new = bin2hex(random_bytes(self::TOKEN_BYTES));
+        } while ($new === $old);
+
+        $_SESSION[self::SESSION_KEY] = $new;
         $_SESSION['_csrf_rotated_at'] = time();
     }
 }

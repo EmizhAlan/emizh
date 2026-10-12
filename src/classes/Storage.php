@@ -269,4 +269,25 @@ final class Storage
         }
         @rmdir($dir);
     }
+
+        /**
+     * Записать сообщение в лог-файл рядом с data/.
+     * Используется для невосстановимых ошибок.
+     */
+    public static function log(string $message): void
+    {
+        $logFile = dirname(self::dataPath()) . DIRECTORY_SEPARATOR . 'emizh.log';
+        $line = '[' . date('c') . '] ' . $message . PHP_EOL;
+
+        // Пишем без блокировки, дописываем в конец
+        @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
+    }
+
+    /**
+     * Путь к лог-файлу (для тестов и отладки).
+     */
+    public static function logPath(): string
+    {
+        return dirname(self::dataPath()) . DIRECTORY_SEPARATOR . 'emizh.log';
+    }
 }

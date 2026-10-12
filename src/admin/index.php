@@ -6,10 +6,22 @@ require_once __DIR__ . '/_init.php';
 
 use Emizh\Classes\Auth;
 use Emizh\Classes\Version;
+use Emizh\Classes\Csrf;
+
+// Проверяем, есть ли активная блокировка входа
+$rateWait = 0;
+if (!empty($_SESSION['_rate_hint']['until'])) {
+    $until = (int)$_SESSION['_rate_hint']['until'];
+    $rateWait = max(0, $until - time());
+    if ($rateWait <= 0) {
+        unset($_SESSION['_rate_hint']);
+    }
+}
 
 $ownerExists = Auth::ownerExists();
 $loggedIn = Auth::isLoggedIn();
 $username = Auth::currentUser();
+$ownerBroken = Auth::ownerFileBroken();
 
 ?><!DOCTYPE html>
 <html lang="ru" data-theme="light">
@@ -23,6 +35,13 @@ $username = Auth::currentUser();
 <body class="admin-body">
 
 <div class="admin-container">
+
+    <?php if ($ownerBroken): ?>
+        <div class="admin-alert admin-alert-error">
+            Файл <code>owner.json</code> повреждён. Приложение не может прочитать данные владельца.
+            Удалите файл вручную и перезагрузите страницу для создания нового владельца.
+        </div>
+    <?php endif; ?>
 
     <?php if ($flashError !== null): ?>
         <div class="admin-alert admin-alert-error"><?= htmlspecialchars((string)$flashError, ENT_QUOTES, 'UTF-8') ?></div>
@@ -65,6 +84,33 @@ $username = Auth::currentUser();
             <h1 class="admin-title">Вход в админку</h1>
             <p class="admin-subtitle">Введите логин и пароль владельца сайта.</p>
 
+            <?php
+                // Проверяем, есть ли блокировка для текущего IP
+                $clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+                $rateKey = 'login:' . $clientIp . ':';
+                // Проверяем по IP без логина — если уже много попыток с этого IP
+                $waitSeconds = 0;
+                foreach ($_SESSION['_rate_hint'] ?? [] as $k => $v) {
+                    // подсказка сохраняется в login.php после неудачной попытки
+                    if (str_starts_with((string)$k, $rateKey)) {
+                        $waitSeconds = max($waitSeconds, (int)$v);
+                    }
+                }
+                if ($waitSeconds > 0):
+                    $minutes = ceil($waitSeconds / 60);
+                ?>
+                    <div class="admin-alert admin-alert-error">
+                        Форма входа временно заблокирована. Попробуйте через <?= (int)$minutes ?> мин.
+                    </div>
+            <?php endif; ?>
+
+            <?php if ($rateWait > 0): ?>
+                <?php $minutes = (int)ceil($rateWait / 60); ?>
+                <div class="admin-alert admin-alert-error">
+                    Форма входа временно заблокирована. Попробуйте через <strong><?= $minutes ?></strong> мин.
+                </div>
+            <?php endif; ?>
+
             <form method="post" action="login.php" class="admin-form">
                 <?= csrfField() ?>
                 <label class="admin-label">
@@ -77,7 +123,7 @@ $username = Auth::currentUser();
                     <input type="password" name="password" required autocomplete="current-password">
                 </label>
 
-                <button type="submit" class="admin-btn">Войти</button>
+                <button type="submit" class="admin-btn"<?= $rateWait > 0 ? ' disabled' : '' ?>>Войти</button>
             </form>
         </div>
 

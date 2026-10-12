@@ -125,7 +125,41 @@ final class RateLimit
         }
 
         $data = json_decode($content, true);
-        return is_array($data) ? $data : [];
+        if (!is_array($data)) {
+            return [];
+        }
+
+        // Автоочистка: удаляем записи старше WINDOW_SECONDS
+        $now = time();
+        $changed = false;
+
+        foreach ($data as $key => $entry) {
+            if (!isset($entry['attempts']) || !is_array($entry['attempts'])) {
+                unset($data[$key]);
+                $changed = true;
+                continue;
+            }
+
+            $fresh = array_values(array_filter(
+                $entry['attempts'],
+                fn($t) => ($now - $t) < self::WINDOW_SECONDS
+            ));
+
+            if ($fresh === []) {
+                unset($data[$key]);
+                $changed = true;
+            } elseif (count($fresh) !== count($entry['attempts'])) {
+                $data[$key]['attempts'] = $fresh;
+                $changed = true;
+            }
+        }
+
+        // Если что-то почистили — сохраняем
+        if ($changed) {
+            self::save($data);
+        }
+
+        return $data;
     }
 
     private static function save(array $data): void

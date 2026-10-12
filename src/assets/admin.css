@@ -192,3 +192,9 @@
     border-radius: 3px;
     color: #333;
 }
+
+.admin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}

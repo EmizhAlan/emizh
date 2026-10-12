@@ -42,6 +42,19 @@ final class Auth
     }
 
     /**
+     * Владелец существует, но его файл повреждён.
+     * Используется в UI для показа специального сообщения.
+     */
+    public static function ownerFileBroken(): bool
+    {
+        if (!self::ownerExists()) {
+            return false;
+        }
+
+        return self::read() === null;
+    }
+
+    /**
      * Прочитать owner.json и вернуть массив.
      * Если файла нет — вернуть null.
      */
@@ -53,18 +66,25 @@ final class Auth
             return null;
         }
 
-        $content = file_get_contents($path);
+        $content = @file_get_contents($path);
         if ($content === false) {
-            throw new RuntimeException('Не удалось прочитать owner.json');
+            Storage::log('Не удалось прочитать owner.json: ' . $path);
+            return null;
         }
 
         $data = json_decode($content, true);
         if (!is_array($data)) {
-            throw new RuntimeException('owner.json повреждён или содержит некорректный JSON');
+            Storage::log('owner.json содержит некорректный JSON: ' . json_last_error_msg());
+            return null;
         }
 
-        if (!isset($data['username'], $data['passwordHash'], $data['secret'])) {
-            throw new RuntimeException('owner.json не содержит обязательных полей');
+        // Проверяем обязательные поля
+        $required = ['username', 'passwordHash', 'secret'];
+        foreach ($required as $field) {
+            if (empty($data[$field]) || !is_string($data[$field])) {
+                Storage::log('owner.json: отсутствует или некорректно поле "' . $field . '"');
+                return null;
+            }
         }
 
         return $data;
@@ -232,7 +252,8 @@ final class Auth
         $dir = dirname($path);
 
         if (!is_dir($dir)) {
-            if (!mkdir($dir, 0755, true) && !is_dir($dir)) {
+            if (!@mkdir($dir, 0755, true) && !is_dir($dir)) {
+                Storage::log('Не удалось создать директорию для owner.json: ' . $dir);
                 throw new RuntimeException('Не удалось создать директорию для owner.json');
             }
         }
@@ -243,20 +264,21 @@ final class Auth
         );
 
         if ($json === false) {
+            Storage::log('owner.json: json_encode вернул false: ' . json_last_error_msg());
             throw new RuntimeException('Не удалось закодировать owner.json');
         }
 
-        // Атомарная запись: временный файл → rename
         $tmp = $path . '.tmp';
-        if (file_put_contents($tmp, $json) === false) {
+        if (@file_put_contents($tmp, $json) === false) {
+            Storage::log('Не удалось записать временный файл: ' . $tmp);
             throw new RuntimeException('Не удалось записать временный файл owner.json');
         }
 
-        // Права 600 — только владелец может читать и писать
         @chmod($tmp, 0600);
 
-        if (!rename($tmp, $path)) {
+        if (!@rename($tmp, $path)) {
             @unlink($tmp);
+            Storage::log('Не удалось переименовать ' . $tmp . ' в ' . $path);
             throw new RuntimeException('Не удалось переименовать owner.json');
         }
     }
@@ -461,10 +483,15 @@ final class Auth
         $last = $_SESSION['last_activity'] ?? 0;
 
         if ($last > 0 && (time() - $last) > self::SESSION_TIMEOUT) {
-            // Сессия истекла — принудительный выход
-            self::logout();
-            self::startSession();
+            // Запоминаем, что пользователь вышел по таймауту
+            $wasUser = $_SESSION['user'];
+
+            // Чистим сессию, но НЕ удаляем cookie — чтобы flash сохранился
+            $_SESSION = [];
+            session_regenerate_id(true);
+
             $_SESSION['flash_error'] = 'Сессия истекла. Войдите снова.';
+            $_SESSION['_timed_out_user'] = $wasUser;
             return;
         }
 
