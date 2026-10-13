@@ -8,6 +8,12 @@ use Emizh\Classes\Auth;
 use Emizh\Classes\Version;
 use Emizh\Classes\Csrf;
 
+$ownerExists = Auth::ownerExists();
+$ownerBroken = $ownerExists && Auth::read() === null;
+
+$loggedIn = Auth::isLoggedIn();
+$username = Auth::currentUser();
+
 // Проверяем, есть ли активная блокировка входа
 $rateWait = 0;
 if (!empty($_SESSION['_rate_hint']['until'])) {
@@ -18,10 +24,6 @@ if (!empty($_SESSION['_rate_hint']['until'])) {
     }
 }
 
-$ownerExists = Auth::ownerExists();
-$loggedIn = Auth::isLoggedIn();
-$username = Auth::currentUser();
-$ownerBroken = Auth::ownerFileBroken();
 
 ?><!DOCTYPE html>
 <html lang="ru" data-theme="light">
@@ -51,7 +53,21 @@ $ownerBroken = Auth::ownerFileBroken();
         <div class="admin-alert admin-alert-success"><?= htmlspecialchars((string)$flashSuccess, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
 
-    <?php if (!$ownerExists): ?>
+        <?php if ($ownerBroken): ?>
+
+        <div class="admin-card">
+            <h1 class="admin-title">Файл владельца повреждён</h1>
+            <p class="admin-subtitle">
+                Файл <code>owner.json</code> существует, но содержит некорректные данные.
+                Приложение не может его прочитать.
+            </p>
+            <p>
+                Удалите файл <code>owner.json</code> вручную (он лежит рядом с папкой
+                <code>data/</code>) и обновите страницу — вы сможете создать нового владельца.
+            </p>
+        </div>
+
+    <?php elseif (!$ownerExists): ?>
 
         <div class="admin-card">
             <h1 class="admin-title">Первый запуск</h1>

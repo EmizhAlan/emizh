@@ -31,3 +31,36 @@ function csrfField(): string
 {
     return Csrf::field();
 }
+
+/**
+ * Форматирует дату из ISO 8601 в читаемый вид.
+ */
+function self_formatDate(string $iso): string
+{
+    $timestamp = strtotime($iso);
+    if ($timestamp === false) {
+        return $iso;
+    }
+
+    $now = time();
+    $diff = $now - $timestamp;
+
+    if ($diff < 60) {
+        return 'только что';
+    }
+
+    if ($diff < 3600) {
+        $min = (int)floor($diff / 60);
+        return $min . ' мин назад';
+    }
+
+    if (date('Y-m-d', $timestamp) === date('Y-m-d')) {
+        return 'сегодня, ' . date('H:i', $timestamp);
+    }
+
+    if (date('Y-m-d', $timestamp) === date('Y-m-d', $now - 86400)) {
+        return 'вчера, ' . date('H:i', $timestamp);
+    }
+
+    return date('d.m.Y', $timestamp);
+}

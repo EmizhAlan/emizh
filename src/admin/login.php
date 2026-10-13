@@ -6,6 +6,7 @@ require_once __DIR__ . '/_init.php';
 
 use Emizh\Classes\Auth;
 use Emizh\Classes\Csrf;
+use Emizh\Classes\RateLimit;
 
 if (!isPost()) {
     adminRedirect('./');
@@ -26,6 +27,17 @@ if ($username === '' || $password === '') {
     adminRedirect('./');
 }
 
+// ↓↓↓ ЭТИ ДВЕ СТРОКИ У ТЕБЯ ПРОПУЩЕНЫ ↓↓↓
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$rateKey = 'login:' . $ip . ':' . mb_strtolower($username);
+// ↑↑↑ ЭТИ ДВЕ СТРОКИ У ТЕБЯ ПРОПУЩЕНЫ ↑↑↑
+
+if (!RateLimit::check($rateKey)) {
+    $wait = RateLimit::secondsUntilRetry($rateKey);
+    $_SESSION['_rate_hint'] = ['until' => time() + $wait];
+    adminRedirect('./');
+}
+
 if (!Auth::login($username, $password)) {
     RateLimit::hit($rateKey);
     $wait = RateLimit::secondsUntilRetry($rateKey);
@@ -37,14 +49,7 @@ if (!Auth::login($username, $password)) {
     adminRedirect('./');
 }
 
-if (!RateLimit::check($rateKey)) {
-    $wait = RateLimit::secondsUntilRetry($rateKey);
-    $_SESSION['_rate_hint'] = ['until' => time() + $wait];
-    adminRedirect('./');
-}
-
 unset($_SESSION['_rate_hint']);
-
 RateLimit::clear($rateKey);
 
 $_SESSION['flash_success'] = 'Вы вошли в админку.';
