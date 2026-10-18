@@ -62,7 +62,7 @@ $pages = $site->pages(); // ['slug' => Page]
                 </p>
             </div>
             <div class="admin-card-actions">
-                <button type="button" class="admin-btn" disabled title="Будет в v0.3.4">Создать страницу</button>
+                <a href="new.php" class="admin-btn">Создать страницу</a>
             </div>
         </div>
 
