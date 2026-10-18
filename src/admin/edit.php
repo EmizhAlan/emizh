@@ -123,7 +123,7 @@ $site = Site::load();
             </div>
 
             <div class="admin-editor-actions">
-                <button type="submit" class="admin-btn" disabled title="Будет в v0.3.2">Сохранить</button>
+                <button type="submit" class="admin-btn">Сохранить</button>
                 <a href="dashboard.php" class="admin-btn admin-btn-secondary">Отмена</a>
             </div>
         </form>
