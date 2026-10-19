@@ -386,3 +386,15 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ---------- Кнопка удаления ---------- */
+
+.admin-btn-danger {
+    background: #dc2626;
+    color: #fff;
+}
+
+.admin-btn-danger:hover {
+    background: #b91c1c;
+    color: #fff;
+}

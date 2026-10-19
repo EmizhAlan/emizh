@@ -93,7 +93,7 @@ $pages = $site->pages(); // ['slug' => Page]
                             </td>
                             <td class="admin-table-actions">
                                 <a href="edit.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Редактировать</a>
-                                <button type="button" class="admin-btn admin-btn-small admin-btn-secondary" disabled title="Будет в v0.3.5">Удалить</button>
+                                <a href="delete.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Удалить</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
