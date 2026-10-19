@@ -92,8 +92,46 @@ $pages = $site->pages(); // ['slug' => Page]
                                 <?= htmlspecialchars(self_formatDate($page->updated()), ENT_QUOTES, 'UTF-8') ?>
                             </td>
                             <td class="admin-table-actions">
-                                <a href="edit.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Редактировать</a>
-                                <a href="delete.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Удалить</a>
+                                <?php
+                                // Порядковый номер страницы в массиве
+                                $allSlugs = array_keys($pages);
+                                $pageIndex = array_search($slug, $allSlugs, true);
+                                $isFirst = ($pageIndex === 0);
+                                $isLast = ($pageIndex === count($allSlugs) - 1);
+                                $isHome = ($slug === $site->homePage());
+                                ?>
+                                
+                                <div class="admin-table-actions-group">
+                                    <!-- Порядок -->
+                                    <div class="admin-table-order">
+                                        <form method="post" action="reorder.php" class="admin-order-form">
+                                            <?= csrfField() ?>
+                                            <input type="hidden" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
+                                            <input type="hidden" name="action" value="up">
+                                            <button type="submit" class="admin-btn-icon" title="Вверх" <?= $isFirst ? 'disabled' : '' ?>>↑</button>
+                                        </form>
+                                        <form method="post" action="reorder.php" class="admin-order-form">
+                                            <?= csrfField() ?>
+                                            <input type="hidden" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
+                                            <input type="hidden" name="action" value="down">
+                                            <button type="submit" class="admin-btn-icon" title="Вниз" <?= $isLast ? 'disabled' : '' ?>>↓</button>
+                                        </form>
+                                    </div>
+                            
+                                    <!-- Главная -->
+                                    <?php if (!$isHome): ?>
+                                        <form method="post" action="reorder.php" class="admin-order-form">
+                                            <?= csrfField() ?>
+                                            <input type="hidden" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
+                                            <input type="hidden" name="action" value="make_home">
+                                            <button type="submit" class="admin-btn admin-btn-small admin-btn-secondary" title="Назначить главной">Сделать главной</button>
+                                        </form>
+                                    <?php endif; ?>
+                            
+                                    <!-- Редактировать и удалить -->
+                                    <a href="edit.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Редактировать</a>
+                                    <a href="delete.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Удалить</a>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

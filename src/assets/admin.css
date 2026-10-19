@@ -398,3 +398,62 @@
     background: #b91c1c;
     color: #fff;
 }
+
+/* ---------- Управление порядком ---------- */
+
+.admin-table-actions-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.admin-table-order {
+    display: flex;
+    gap: 2px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.admin-order-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-btn-icon {
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-btn-icon:hover:not(:disabled) {
+    background: #f5f5f5;
+}
+
+.admin-btn-icon:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Адаптация для таблицы при малой ширине */
+@media (max-width: 900px) {
+    .admin-table-actions-group {
+        justify-content: flex-start;
+    }
+    .admin-table th.admin-table-actions {
+        text-align: left;
+    }
+}
