@@ -34,6 +34,7 @@ $pages = $site->pages(); // ['slug' => Page]
         <div class="admin-topbar-user">
             <?= htmlspecialchars((string)$username, ENT_QUOTES, 'UTF-8') ?>
             <a href="password.php" class="admin-btn admin-btn-small admin-btn-secondary">Сменить пароль</a>
+            <a href="update.php" class="admin-btn admin-btn-small admin-btn-secondary">Обновление</a>
             <a href="../" target="_blank" class="admin-btn admin-btn-small admin-btn-secondary">Открыть сайт</a>
             <form method="post" action="logout.php" style="display:inline">
                 <?= csrfField() ?>
