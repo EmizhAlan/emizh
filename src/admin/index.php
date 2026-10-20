@@ -30,7 +30,7 @@ if (!empty($_SESSION['_rate_hint']['until'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админка — emizh</title>
+    <title><?= htmlspecialchars(Auth::ownerExists() ? 'Вход' : 'Первый запуск', ENT_QUOTES, 'UTF-8') ?> — emizh</title>
     <link rel="stylesheet" href="../assets/app.css">
     <link rel="stylesheet" href="../assets/admin.css">
 </head>

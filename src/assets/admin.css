@@ -457,3 +457,74 @@
         text-align: left;
     }
 }
+
+/* ---------- Пустые состояния ---------- */
+
+.admin-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: #666;
+}
+
+.admin-empty p {
+    margin: 0 0 20px;
+    font-size: 15px;
+}
+
+/* ---------- Улучшения адаптации ---------- */
+
+@media (max-width: 780px) {
+    .admin-container-wide {
+        max-width: 100%;
+    }
+
+    .admin-card {
+        padding: 24px 20px;
+    }
+
+    .admin-card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-card-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .admin-table {
+        margin: 0 -20px;
+        width: calc(100% + 40px);
+        font-size: 13.5px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 10px 12px;
+    }
+
+    .admin-table-actions-group {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .admin-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .admin-topbar-user {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .admin-editor-actions {
+        flex-direction: column-reverse;
+    }
+
+    .admin-editor-actions .admin-btn {
+        width: 100%;
+    }
+}

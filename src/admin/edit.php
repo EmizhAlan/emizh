@@ -66,7 +66,8 @@ $site = Site::load();
                 </p>
             </div>
             <div class="admin-card-actions">
-                <a href="dashboard.php" class="admin-btn admin-btn-secondary">Отмена</a>
+                <a href="../?page=<?= urlencode($slug) ?>" target="_blank" class="admin-btn admin-btn-small admin-btn-secondary">Посмотреть на сайте</a>
+                <a href="dashboard.php" class="admin-btn admin-btn-small admin-btn-secondary">Отмена</a>
             </div>
         </div>
 

@@ -34,6 +34,7 @@ $pages = $site->pages(); // ['slug' => Page]
         <div class="admin-topbar-user">
             <?= htmlspecialchars((string)$username, ENT_QUOTES, 'UTF-8') ?>
             <a href="password.php" class="admin-btn admin-btn-small admin-btn-secondary">Сменить пароль</a>
+            <a href="../" target="_blank" class="admin-btn admin-btn-small admin-btn-secondary">Открыть сайт</a>
             <form method="post" action="logout.php" style="display:inline">
                 <?= csrfField() ?>
                 <button type="submit" class="admin-btn admin-btn-small admin-btn-secondary">Выйти</button>
@@ -66,7 +67,15 @@ $pages = $site->pages(); // ['slug' => Page]
             </div>
         </div>
 
-        <?php if ($pages !== []): ?>
+        <?php if ($pages === []): ?>
+
+            <div class="admin-empty">
+                <p>Пока пусто. Создайте первую страницу, чтобы начать.</p>
+                <a href="new.php" class="admin-btn">Создать первую страницу</a>
+            </div>
+
+        <?php else: ?>
+
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -93,7 +102,6 @@ $pages = $site->pages(); // ['slug' => Page]
                             </td>
                             <td class="admin-table-actions">
                                 <?php
-                                // Порядковый номер страницы в массиве
                                 $allSlugs = array_keys($pages);
                                 $pageIndex = array_search($slug, $allSlugs, true);
                                 $isFirst = ($pageIndex === 0);
@@ -117,7 +125,7 @@ $pages = $site->pages(); // ['slug' => Page]
                                             <button type="submit" class="admin-btn-icon" title="Вниз" <?= $isLast ? 'disabled' : '' ?>>↓</button>
                                         </form>
                                     </div>
-                            
+
                                     <!-- Главная -->
                                     <?php if (!$isHome): ?>
                                         <form method="post" action="reorder.php" class="admin-order-form">
@@ -127,7 +135,7 @@ $pages = $site->pages(); // ['slug' => Page]
                                             <button type="submit" class="admin-btn admin-btn-small admin-btn-secondary" title="Назначить главной">Сделать главной</button>
                                         </form>
                                     <?php endif; ?>
-                            
+
                                     <!-- Редактировать и удалить -->
                                     <a href="edit.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Редактировать</a>
                                     <a href="delete.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Удалить</a>
@@ -137,6 +145,7 @@ $pages = $site->pages(); // ['slug' => Page]
                     <?php endforeach; ?>
                 </tbody>
             </table>
+
         <?php endif; ?>
     </div>
 
