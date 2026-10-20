@@ -22,6 +22,7 @@ $originalSlug = trim((string)($_POST['original_slug'] ?? ''));
 $title        = trim((string)($_POST['title'] ?? ''));
 $newSlug      = trim((string)($_POST['slug'] ?? ''));
 $content      = (string)($_POST['content'] ?? '');
+$showInNav = isset($_POST['show_in_nav']);
 
 // ---- Валидация ----
 
@@ -61,6 +62,7 @@ if ($slugChanged && Page::exists($newSlug)) {
 // ---- Обновляем объект ----
 $page->setTitle($title);
 $page->setContent($content);
+$page->setShowInNav($showInNav);
 
 // ---- Сохраняем ----
 

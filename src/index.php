@@ -77,7 +77,7 @@ $font        = $site->font();
         <a href="./" class="site-title"><?= e($siteTitle) ?></a>
 
         <nav class="site-nav">
-            <?php foreach ($site->pages() as $slug => $navPage): ?>
+            <?php foreach ($site->navPages() as $slug => $navPage): ?>
                 <?php
                     $isActive = $page !== null && $page->slug() === $slug;
                     $href = './?page=' . urlencode($slug);

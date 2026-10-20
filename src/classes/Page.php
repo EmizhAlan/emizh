@@ -22,13 +22,15 @@ final class Page
     private string $content;
     private string $created;
     private string $updated;
+    private bool $showInNav;
 
     public function __construct(
         string $slug,
         string $title,
         string $content,
         ?string $created = null,
-        ?string $updated = null
+        ?string $updated = null,
+        bool $showInNav = true 
     ) {
         self::validateSlug($slug);
 
@@ -55,7 +57,8 @@ final class Page
             (string) $data['title'],
             (string) ($data['content'] ?? ''),
             isset($data['created']) ? (string) $data['created'] : null,
-            isset($data['updated']) ? (string) $data['updated'] : null
+            isset($data['updated']) ? (string) $data['updated'] : null,
+            isset($data['showInNav']) ? (bool)$data['showInNav'] : true
         );
     }
 
@@ -70,6 +73,7 @@ final class Page
             'content' => $this->content,
             'created' => $this->created,
             'updated' => $this->updated,
+            'showInNav' => $this->showInNav,
         ];
     }
 
@@ -271,5 +275,11 @@ final class Page
     private static function now(): string
     {
         return date('c');
+    }
+
+    public function showInNav(): bool { return $this->showInNav; }
+    public function setShowInNav(bool $show): void {
+        $this->showInNav = $show;
+        $this->touch();
     }
 }

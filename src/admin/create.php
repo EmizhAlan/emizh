@@ -21,6 +21,7 @@ Csrf::requireValid();
 $title   = trim((string)($_POST['title'] ?? ''));
 $slug    = trim((string)($_POST['slug'] ?? ''));
 $content = (string)($_POST['content'] ?? '');
+$showInNav = isset($_POST['show_in_nav']);
 
 // ---- Валидация ----
 
@@ -46,7 +47,7 @@ if (trim($content) === '') {
 
 // ---- Создаём страницу ----
 try {
-    $page = new Page($slug, $title, $content);
+    $page = new Page($slug, $title, $content, null, null, $showInNav);
     $page->save();
 } catch (\Throwable $e) {
     $_SESSION['flash_error'] = 'Не удалось создать страницу: ' . $e->getMessage();

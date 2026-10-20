@@ -236,4 +236,13 @@ final class Site
         }
         return str_starts_with($color, '#') ? $color : '#' . $color;
     }
+
+    /**
+     * Страницы, которые нужно показывать в навигации.
+     * @return Page[]
+     */
+    public function navPages(): array
+    {
+        return array_filter($this->pages(), fn($page) => $page->showInNav());
+    }
 }

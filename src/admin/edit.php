@@ -76,6 +76,17 @@ $site = Site::load();
             <input type="hidden" name="original_slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
 
             <div class="admin-editor-meta">
+
+                <label class="admin-checkbox">
+                    <input
+                        type="checkbox"
+                        name="show_in_nav"
+                        value="1"
+                        <?= $page->showInNav() ? 'checked' : '' ?>
+                    >
+                    <span>Показывать в навигации сайта</span>
+                </label>
+
                 <label class="admin-label">
                     <span>Заголовок</span>
                     <input

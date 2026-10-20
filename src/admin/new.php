@@ -52,6 +52,7 @@ $site = Site::load();
 
         <form method="post" action="create.php" class="admin-editor-form" id="editor-form">
             <?= csrfField() ?>
+            <input type="hidden" name="show_in_nav" value="1">
 
             <div class="admin-editor-meta">
                 <label class="admin-label">
