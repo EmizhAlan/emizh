@@ -24,6 +24,9 @@ final class Site
     private string $homePage;
     /** @var string[] */
     private array $pageOrder;
+    private string $logo;
+    private string $favicon = '';
+    private bool $showLogoInHeader = true;
 
     public function __construct(
         string $title = 'Мой сайт',
@@ -33,7 +36,10 @@ final class Site
         string $description = '',
         string $author = '',
         string $homePage = '',
-        array $pageOrder = []
+        array $pageOrder = [],
+        string $logo = '',
+        string $favicon = '',
+        bool $showLogoInHeader = true
     ) {
         $this->title = $title;
         $this->accentColor = self::normalizeColor($accentColor);
@@ -43,6 +49,9 @@ final class Site
         $this->author = $author;
         $this->homePage = $homePage;
         $this->pageOrder = array_values(array_unique($pageOrder));
+        $this->logo = $logo;
+        $this->favicon = $favicon;
+        $this->showLogoInHeader = $showLogoInHeader;
     }
 
     /**
@@ -69,7 +78,10 @@ final class Site
             (string) ($data['description'] ?? ''),
             (string) ($data['author'] ?? ''),
             (string) ($data['homePage'] ?? ''),
-            is_array($data['pageOrder'] ?? null) ? $data['pageOrder'] : []
+            is_array($data['pageOrder'] ?? null) ? $data['pageOrder'] : [],
+            (string) ($data['logo'] ?? ''),
+            (string)($data['favicon'] ?? ''),
+            (bool) ($data['showLogoInHeader'] ?? true)
         );
     }
 
@@ -92,6 +104,9 @@ final class Site
             'author' => $this->author,
             'homePage' => $this->homePage,
             'pageOrder' => $this->pageOrder,
+            'logo' => $this->logo,
+            'favicon' => $this->favicon,
+            'showLogoInHeader' => $this->showLogoInHeader,
         ];
     }
 
@@ -108,6 +123,11 @@ final class Site
     /** @return string[] */
     public function pageOrder(): array { return $this->pageOrder; }
 
+    public function logo(): string { return $this->logo; }
+    public function favicon(): string { return $this->favicon; }
+
+    public function showLogoInHeader(): bool { return $this->showLogoInHeader; }
+
     // ---------- Сеттеры ----------
 
     public function setTitle(string $title): void { $this->title = trim($title) ?: 'Мой сайт'; }
@@ -116,6 +136,11 @@ final class Site
     public function setTheme(string $theme): void { $this->theme = self::normalizeTheme($theme); }
     public function setDescription(string $d): void { $this->description = $d; }
     public function setAuthor(string $a): void { $this->author = $a; }
+
+    public function setLogo(string $logo): void { $this->logo = $logo; }
+    public function setFavicon(string $favicon): void { $this->favicon = $favicon; }
+
+    public function setShowLogoInHeader(bool $show): void { $this->showLogoInHeader = $show; }
 
     // ---------- Работа со страницами ----------
 

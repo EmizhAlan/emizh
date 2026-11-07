@@ -261,6 +261,20 @@ final class Markdown
      */
     private function parseInline(string $text): string
     {
+        // Картинки: ![alt](url)
+        $text = preg_replace_callback(
+            '/!\[([^\]]*)\]\(([^)]+)\)/',
+            function (array $m): string {
+                $alt = $m[1];
+                $src = $m[2];
+                // Если картинка из uploads, меняем путь на media.php
+                if (str_starts_with($src, 'uploads/')) {
+                    $src = 'media.php?file=' . basename($src);
+                }
+                return '<img src="' . $src . '" alt="' . $alt . '" style="max-width:100%; height:auto;">';
+            },
+            $text
+        );
         // Ссылки: [текст](url)
         $text = $this->parseLinks($text);
 

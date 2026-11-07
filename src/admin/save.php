@@ -62,7 +62,6 @@ if ($slugChanged && Page::exists($newSlug)) {
 // ---- Обновляем объект ----
 $page->setTitle($title);
 $page->setContent($content);
-$page->setShowInNav($showInNav);
 
 // ---- Сохраняем ----
 

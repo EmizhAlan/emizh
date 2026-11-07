@@ -301,76 +301,84 @@
     margin-bottom: 20px;
 }
 
-.admin-editor-split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+/* Обертка для текстового поля */
+/* Убираем старые ограничения, если они есть */
+.admin-editor-main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     margin-bottom: 24px;
 }
 
-.admin-editor-pane {
-    display: flex;
-    flex-direction: column;
-}
-
-.admin-editor-pane .admin-label {
-    height: 100%;
-}
-
-.admin-editor-pane textarea {
+/* Принудительно задаем большой размер для поля ввода */
+.admin-editor-main textarea {
     font-family: Consolas, "Courier New", monospace;
-    font-size: 13.5px;
-    line-height: 1.55;
-    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 16px;
     border: 1px solid #d0d0d0;
     border-radius: 6px;
     background: #fff;
-    resize: vertical;
-    min-height: 400px;
+    resize: vertical; 
+    
+    /* ВОТ ГЛАВНОЕ: */
     width: 100%;
+    min-height: 450px; /* Большая высота */
     box-sizing: border-box;
 }
 
-.admin-editor-pane textarea:focus {
+.admin-editor-main textarea:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.admin-editor-preview-body {
+.admin-upload-zone {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Блок предпросмотра */
+.admin-editor-preview-section {
+    margin-bottom: 24px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
+    overflow: hidden;
     background: #fafafa;
-    padding: 16px 20px;
-    min-height: 400px;
+}
+
+.admin-editor-preview-header {
+    background: #f4f4f4;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
+.admin-editor-preview-body {
+    padding: 24px 32px;
+    min-height: 200px;
+    max-height: 500px;
     overflow-y: auto;
     font-size: 15px;
     line-height: 1.65;
 }
 
-.admin-editor-preview-body h1 { font-size: 26px; margin: 20px 0 12px; }
-.admin-editor-preview-body h2 { font-size: 21px; margin: 18px 0 10px; }
-.admin-editor-preview-body h3 { font-size: 18px; margin: 16px 0 8px; }
+/* Элементы внутри предпросмотра */
+.admin-editor-preview-body h1 { font-size: 26px; margin: 20px 0 12px; font-weight: 600; }
+.admin-editor-preview-body h2 { font-size: 21px; margin: 18px 0 10px; font-weight: 600; }
+.admin-editor-preview-body h3 { font-size: 18px; margin: 16px 0 8px; font-weight: 600; }
 .admin-editor-preview-body p { margin: 0 0 12px; }
 .admin-editor-preview-body ul,
 .admin-editor-preview-body ol { margin: 0 0 12px; padding-left: 24px; }
-.admin-editor-preview-body pre {
-    background: #f0f0f0;
-    padding: 12px 16px;
-    border-radius: 4px;
-    overflow-x: auto;
-    font-size: 13px;
-}
-.admin-editor-preview-body code {
-    font-family: Consolas, monospace;
-    font-size: 0.92em;
-    background: #eef0f2;
-    padding: 1px 5px;
-    border-radius: 3px;
-}
-.admin-editor-preview-body a {
-    color: #3b82f6;
-}
+.admin-editor-preview-body pre { background: #f0f0f0; padding: 12px 16px; border-radius: 4px; overflow-x: auto; font-size: 13px; }
+.admin-editor-preview-body code { font-family: Consolas, monospace; font-size: 0.92em; background: #eef0f2; padding: 2px 6px; border-radius: 4px; }
 
 .admin-editor-actions {
     display: flex;
@@ -380,10 +388,16 @@
     border-top: 1px solid #eee;
 }
 
+/* Адаптивность (на мобильных) */
 @media (max-width: 780px) {
-    .admin-editor-meta,
-    .admin-editor-split {
+    .admin-editor-meta {
         grid-template-columns: 1fr;
+    }
+    .admin-editor-main textarea {
+        min-height: 250px;
+    }
+    .admin-editor-preview-body {
+        padding: 16px;
     }
 }
 
@@ -527,4 +541,29 @@
     .admin-editor-actions .admin-btn {
         width: 100%;
     }
+}
+
+/* Настройки в две колонки */
+.admin-settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 24px;
+}
+@media (max-width: 780px) {
+    .admin-settings-grid { grid-template-columns: 1fr; }
+}
+.admin-settings-block {
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    padding: 20px;
+    border-radius: 6px;
+}
+.admin-settings-block h3 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #333;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 8px;
 }

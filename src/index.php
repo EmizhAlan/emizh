@@ -56,6 +56,12 @@ $font        = $site->font();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($fullTitle) ?></title>
+    <?php if ($site->favicon() !== ''): ?>
+        <link rel="icon" href="media.php?file=<?= urlencode(basename($site->favicon())) ?>">
+    <?php elseif ($site->logo() !== ''): ?>
+        <!-- Если favicon нет, но есть логотип, используем его -->
+        <link rel="icon" href="media.php?file=<?= urlencode(basename($site->logo())) ?>">
+    <?php endif; ?>
     <?php if ($description !== ''): ?>
         <meta name="description" content="<?= e($description) ?>">
     <?php endif; ?>
@@ -74,7 +80,15 @@ $font        = $site->font();
 
 <header class="site-header">
     <div class="container">
-        <a href="./" class="site-title"><?= e($siteTitle) ?></a>
+        <a href="./" class="site-title" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+            <?php if ($site->logo() !== '' && $site->showLogoInHeader()): ?>
+                <img src="media.php?file=<?= urlencode(basename($site->logo())) ?>" 
+                     alt="<?= e($siteTitle) ?>" 
+                     style="height: 32px; width: auto; display: block;">
+            <?php endif; ?>
+            
+            <span><?= e($siteTitle) ?></span>
+        </a>
 
         <nav class="site-nav">
             <?php foreach ($site->navPages() as $slug => $navPage): ?>

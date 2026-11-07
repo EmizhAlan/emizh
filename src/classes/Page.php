@@ -22,7 +22,7 @@ final class Page
     private string $content;
     private string $created;
     private string $updated;
-    private bool $showInNav;
+    private bool $showInNav = true;
 
     public function __construct(
         string $slug,
@@ -41,6 +41,7 @@ final class Page
         $this->content = $content;
         $this->created = $created ?? $now;
         $this->updated = $updated ?? $now;
+        $this->showInNav = $showInNav;
     }
 
     /**
@@ -58,6 +59,7 @@ final class Page
             (string) ($data['content'] ?? ''),
             isset($data['created']) ? (string) $data['created'] : null,
             isset($data['updated']) ? (string) $data['updated'] : null,
+            isset($data['showInNav']) ? (bool)$data['showInNav'] : true,
             isset($data['showInNav']) ? (bool)$data['showInNav'] : true
         );
     }

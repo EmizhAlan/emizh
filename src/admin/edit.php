@@ -75,63 +75,42 @@ $site = Site::load();
             <?= csrfField() ?>
             <input type="hidden" name="original_slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
 
+            <!-- Верхняя панель: Заголовок и Слаг -->
             <div class="admin-editor-meta">
-
-                <label class="admin-checkbox">
-                    <input
-                        type="checkbox"
-                        name="show_in_nav"
-                        value="1"
-                        <?= $page->showInNav() ? 'checked' : '' ?>
-                    >
-                    <span>Показывать в навигации сайта</span>
-                </label>
-
                 <label class="admin-label">
                     <span>Заголовок</span>
-                    <input
-                        type="text"
-                        name="title"
-                        value="<?= htmlspecialchars($page->title(), ENT_QUOTES, 'UTF-8') ?>"
-                        required
-                        maxlength="200"
-                        autocomplete="off"
-                    >
+                    <input type="text" name="title" value="<?= htmlspecialchars($page->title(), ENT_QUOTES, 'UTF-8') ?>" required maxlength="200" autocomplete="off">
                 </label>
-
                 <label class="admin-label">
                     <span>Адрес (слаг)</span>
-                    <input
-                        type="text"
-                        name="slug"
-                        value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>"
-                        required
-                        maxlength="64"
-                        pattern="[a-z0-9-]{1,64}"
-                        autocomplete="off"
-                        title="Только строчные латинские буквы, цифры и дефис"
-                    >
+                    <input type="text" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>" required maxlength="64" pattern="[a-z0-9-]{1,64}" autocomplete="off" title="Только строчные латинские буквы, цифры и дефис">
                 </label>
             </div>
 
-            <div class="admin-editor-split">
-                <div class="admin-editor-pane">
-                    <label class="admin-label">
-                        <span>Содержание (markdown)</span>
-                        <textarea
-                            name="content"
-                            id="editor-content"
-                            required
-                            spellcheck="false"
-                        ><?= htmlspecialchars($page->content(), ENT_QUOTES, 'UTF-8') ?></textarea>
-                    </label>
+            <!-- Поле ввода на всю ширину -->
+            <div class="admin-editor-main" style="margin-bottom: 20px;">
+                <label class="admin-label">
+                    <span>Содержание (markdown)</span>
+                    <textarea name="content" id="editor-content" required spellcheck="false"><?= htmlspecialchars($page->content(), ENT_QUOTES, 'UTF-8') ?></textarea>
+                </label>
+                
+                <!-- Кнопка загрузки картинки -->
+                <div class="admin-upload-zone">
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                    <button type="button" class="admin-btn admin-btn-small admin-btn-secondary" onclick="document.getElementById('image-upload').click()">
+                        Вставить картинку
+                    </button>
+                    <span id="upload-status"></span>
                 </div>
-                <div class="admin-editor-pane admin-editor-preview">
-                    <div class="admin-label">
-                        <span>Предпросмотр</span>
-                    </div>
-                    <div class="admin-editor-preview-body markdown" id="editor-preview"></div>
+            </div>
+
+            <!-- Предпросмотр под редактором -->
+            <div class="admin-editor-preview-section">
+                <div class="admin-editor-preview-header">
+                    <span>Предпросмотр</span>
+                    <a href="../?page=<?= urlencode($slug) ?>" target="_blank" class="admin-btn admin-btn-small admin-btn-secondary">Посмотреть на сайте ↗</a>
                 </div>
+                <div class="admin-editor-preview-body markdown" id="editor-preview"></div>
             </div>
 
             <div class="admin-editor-actions">

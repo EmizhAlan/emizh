@@ -272,3 +272,16 @@ a:hover {
     opacity: 0.6;
     font-family: monospace;
 }
+
+/* Загрузка изображений */
+.admin-upload-zone {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.site-logo {
+    height: 32px;
+    width: auto;
+    display: block;
+}

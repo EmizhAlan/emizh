@@ -35,6 +35,7 @@ $pages = $site->pages(); // ['slug' => Page]
             <?= htmlspecialchars((string)$username, ENT_QUOTES, 'UTF-8') ?>
             <a href="password.php" class="admin-btn admin-btn-small admin-btn-secondary">Сменить пароль</a>
             <a href="update.php" class="admin-btn admin-btn-small admin-btn-secondary">Обновление</a>
+            <a href="settings.php" class="admin-btn admin-btn-small admin-btn-secondary">Настройки сайта</a>
             <a href="../" target="_blank" class="admin-btn admin-btn-small admin-btn-secondary">Открыть сайт</a>
             <form method="post" action="logout.php" style="display:inline">
                 <?= csrfField() ?>
@@ -140,6 +141,14 @@ $pages = $site->pages(); // ['slug' => Page]
                                     <!-- Редактировать и удалить -->
                                     <a href="edit.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Редактировать</a>
                                     <a href="delete.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Удалить</a>
+                                    <!-- Добавь это рядом с кнопкой "Сделать главной" -->
+                                    <form method="post" action="toggle_nav.php" class="admin-order-form">
+                                        <?= csrfField() ?>
+                                        <input type="hidden" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
+                                        <button type="submit" class="admin-btn admin-btn-small admin-btn-secondary" title="<?= $page->showInNav() ? 'Скрыть из меню' : 'Показать в меню' ?>">
+                                            <?= $page->showInNav() ? 'В меню ✓' : 'В меню ✗' ?>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
