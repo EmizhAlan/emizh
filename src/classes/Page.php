@@ -245,33 +245,101 @@ final class Page
 
     /**
      * Сгенерировать слаг из произвольного заголовка.
-     * Например: "Моя первая страница" → "moya-pervaya-stranica".
+     *
+     * Поддерживает русский, украинский, белорусский, английский и другие.
+     * Обрабатывает CamelCase, специальные дефисы, кавычки и прочие символы.
+     *
+     * Примеры:
+     *   "Моя первая страница"   → "moya-pervaya-stranica"
+     *   "Проект «Мой сайт»"     → "proekt-moy-sait"
+     *   "My Cool Page"          → "my-cool-page"
+     *   "Тест — это просто"      → "test-eto-prosto"
+     *
+     * Если результат пустой или невалидный — генерируется уникальный fallback.
      */
-    public static function slugify(string $title): string
+    public static function slugify(string $title, array $existingSlugs = []): string
     {
         $map = [
+            // Русский
             'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
-            'е' => 'e', 'ё' => 'e', 'ж' => 'zh', 'з' => 'z', 'и' => 'i',
+            'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i',
             'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n',
             'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't',
-            'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'ts', 'ч' => 'ch',
-            'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '',
+            'у' => 'u', 'ф' => 'f', 'х' => 'kh', 'ц' => 'ts', 'ч' => 'ch',
+            'ш' => 'sh', 'щ' => 'shch', 'ъ' => '', 'ы' => 'y', 'ь' => '',
             'э' => 'e', 'ю' => 'yu', 'я' => 'ya',
+            // Украинский
+            'є' => 'ye', 'і' => 'i', 'ї' => 'yi',
+            // Белорусский
+            'ў' => 'u',
+            // Специальные символы
+            '—' => '-', '–' => '-', '€' => 'eur',
+            // Кавычки
+            '«' => '', '»' => '', '„' => '', '"' => '',
+            '‘' => '', '’' => '',
+            // Прочее
+            '@' => 'at', '&' => 'and', '№' => 'no', '+' => 'plus',
         ];
 
-        $lower = mb_strtolower($title, 'UTF-8');
-        $replaced = strtr($lower, $map);
+        // Транслитерация
+        $slug = strtr($title, $map);
 
-        // Убираем всё, кроме латиницы, цифр и пробелов
-        $clean = preg_replace('/[^a-z0-9\s-]+/u', '', $replaced);
-        $clean = preg_replace('/[\s-]+/', '-', $clean);
-        $clean = trim($clean, '-');
+        // CamelCase → camel-case (например "MyPage" → "my-page")
+        $slug = preg_replace('/([a-z])([A-Z])/', '$1-$2', $slug);
 
-        if ($clean === '' || !self::isValidSlug($clean)) {
-            $clean = 'page-' . substr(md5($title . microtime()), 0, 8);
+        // Приводим к нижнему регистру
+        $slug = mb_strtolower($slug, 'UTF-8');
+
+        // Убираем всё, кроме строчных латинских букв, цифр, пробелов и дефисов
+        $slug = preg_replace('/[^a-z0-9\s-]+/u', '', $slug);
+
+        // Дефисы и пробелы → дефисы, убираем дубли
+        $slug = preg_replace('/[\s-]+/', '-', $slug);
+
+        // Убираем дефисы с краёв
+        $slug = trim($slug, '-');
+
+        // Обрезаем до 64 символов, стараясь не резать слово
+        if (mb_strlen($slug) > 64) {
+            $cut = mb_substr($slug, 0, 64);
+            // Если последний символ не дефис — ищем ближайший дефис назад
+            if (!str_ends_with($cut, '-')) {
+                $lastDash = strrpos($cut, '-');
+                if ($lastDash !== false) {
+                    $slug = mb_substr($cut, 0, $lastDash);
+                } else {
+                    $slug = $cut;
+                }
+            }
         }
 
-        return $clean;
+        $slug = trim($slug, '-');
+
+        // Если пусто или невалидно — уникальный fallback
+        if ($slug === '' || !self::isValidSlug($slug)) {
+            $base = 'page-' . substr(md5($title . microtime(true)), 0, 8);
+            return self->uniqueSlug($base, $existingSlugs);
+        }
+
+        // Проверяем уникальность
+        return self::uniqueSlug($slug, $existingSlugs);
+    }
+
+    /**
+     * Если слаг уже занят — добавляем -2, -3 и т.д.
+     */
+    private static function uniqueSlug(string $slug, array $existingSlugs): string
+    {
+        if (!in_array($slug, $existingSlugs, true)) {
+            return $slug;
+        }
+
+        $n = 2;
+        while (in_array($slug . '-' . $n, $existingSlugs, true)) {
+            $n++;
+        }
+
+        return $slug . '-' . $n;
     }
 
     private function touch(): void

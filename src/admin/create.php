@@ -30,6 +30,12 @@ if ($title === '') {
     adminRedirect('new.php');
 }
 
+// Если слаг не заполнен — генерируем из заголовка
+if ($slug === '') {
+    $existing = array_keys(Page::loadAll());
+    $slug = Page::slugify($title, $existing);
+}
+
 if (!Page::isValidSlug($slug)) {
     $_SESSION['flash_error'] = 'Адрес страницы содержит недопустимые символы. Разрешены строчные латинские буквы, цифры и дефис.';
     adminRedirect('new.php');

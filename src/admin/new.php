@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/_init.php';
 
 use Emizh\Classes\Auth;
+use Emizh\Classes\Page;
 use Emizh\Classes\Site;
 use Emizh\Classes\Version;
 
@@ -69,14 +70,13 @@ $site = Site::load();
                 </label>
 
                 <label class="admin-label">
-                    <span>Адрес (слаг)</span>
+                    <span>Адрес (слаг) <small style="color:#888;font-weight:normal;">— заполнится автоматически</small></span>
                     <input
                         type="text"
                         name="slug"
                         id="input-slug"
-                        required
                         maxlength="64"
-                        pattern="[a-z0-9-]{1,64}"
+                        pattern="[a-z0-9-]{0,64}"
                         autocomplete="off"
                         title="Только строчные латинские буквы, цифры и дефис"
                     >
@@ -118,45 +118,14 @@ $site = Site::load();
 </div>
 
 <script src="../assets/admin-editor.js"></script>
+<script src="../assets/admin-slug.js"></script>
 <script>
-// Автогенерация слага из заголовка
-(function () {
-    var titleInput = document.getElementById('input-title');
-    var slugInput = document.getElementById('input-slug');
-    var slugManuallyEdited = false;
-
-    if (!titleInput || !slugInput) return;
-
-    // Транслитерация (упрощённая, как в Page::slugify)
-    var map = {
-        'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e','ж':'zh',
-        'з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o',
-        'п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts',
-        'ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'
-    };
-
-    function slugify(text) {
-        return text
-            .toLowerCase()
-            .split('')
-            .map(function (ch) { return map[ch] !== undefined ? map[ch] : ch; })
-            .join('')
-            .replace(/[^a-z0-9\s-]+/g, '')
-            .replace(/[\s-]+/g, '-')
-            .replace(/^-+|-+$/g, '')
-            .substring(0, 64);
-    }
-
-    titleInput.addEventListener('input', function () {
-        if (!slugManuallyEdited) {
-            slugInput.value = slugify(titleInput.value);
-        }
-    });
-
-    slugInput.addEventListener('input', function () {
-        slugManuallyEdited = true;
-    });
-})();
+// Автогенерация слага из заголовка (логика — в assets/admin-slug.js)
+EmizhSlug.bind(
+    document.getElementById('input-title'),
+    document.getElementById('input-slug'),
+    <?= json_encode(array_keys(Page::loadAll()), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) ?>
+);
 </script>
 
 </body>

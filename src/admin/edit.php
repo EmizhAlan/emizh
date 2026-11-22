@@ -79,11 +79,14 @@ $site = Site::load();
             <div class="admin-editor-meta">
                 <label class="admin-label">
                     <span>Заголовок</span>
-                    <input type="text" name="title" value="<?= htmlspecialchars($page->title(), ENT_QUOTES, 'UTF-8') ?>" required maxlength="200" autocomplete="off">
+                    <input type="text" id="input-title" name="title" value="<?= htmlspecialchars($page->title(), ENT_QUOTES, 'UTF-8') ?>" required maxlength="200" autocomplete="off">
                 </label>
                 <label class="admin-label">
                     <span>Адрес (слаг)</span>
-                    <input type="text" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>" required maxlength="64" pattern="[a-z0-9-]{1,64}" autocomplete="off" title="Только строчные латинские буквы, цифры и дефис">
+                    <div style="display:flex; gap:6px; align-items:flex-end;">
+                        <input type="text" id="input-slug" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>" required maxlength="64" pattern="[a-z0-9-]{1,64}" autocomplete="off" title="Только строчные латинские буквы, цифры и дефис" style="flex:1;">
+                        <button type="button" id="btn-regenerate-slug" class="admin-btn admin-btn-small admin-btn-secondary" title="Сгенерировать слаг из заголовка" style="margin-bottom:1px;">↺</button>
+                    </div>
                 </label>
             </div>
 
@@ -127,6 +130,36 @@ $site = Site::load();
 </div>
 
 <script src="../assets/admin-editor.js"></script>
+<script src="../assets/admin-slug.js"></script>
+<script>
+(function () {
+    var slugs = <?= json_encode(
+        array_values(array_filter(
+            array_keys(Page::loadAll()),
+            fn($s) => $s !== $slug  // исключаем текущую страницу
+        )),
+        JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+    ) ?>;
+    var titleInput = document.getElementById('input-title');
+    var slugInput = document.getElementById('input-slug');
+    var btnRegenerate = document.getElementById('btn-regenerate-slug');
+
+    // Отслеживаем ручное редактирование слага
+    var manuallyEdited = false;
+    slugInput.addEventListener('input', function () {
+        manuallyEdited = true;
+    });
+
+    // Кнопка «Сгенерировать из заголовка» — безопасна, не перезаписывает
+    // при авто-обновлении (на edit-странице авто-обновления нет).
+    btnRegenerate.addEventListener('click', function () {
+        var title = titleInput.value.trim();
+        if (title === '') return;
+        slugInput.value = EmizhSlug.fromTitle(title, slugs);
+        manuallyEdited = false;
+    });
+})();
+</script>
 
 </body>
 </html>
