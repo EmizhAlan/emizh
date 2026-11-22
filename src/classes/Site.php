@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emizh\Classes;
 
 use InvalidArgumentException;
+use Throwable;
 
 /**
  * Модель сайта: настройки + список страниц + порядок.
@@ -83,6 +84,26 @@ final class Site
             (string)($data['favicon'] ?? ''),
             (bool) ($data['showLogoInHeader'] ?? true)
         );
+    }
+
+    /**
+     * Безопасная загрузка для читательской части.
+     *
+     * Если site.json повреждён — пишет ошибку в лог и возвращает сайт
+     * с дефолтными настройками, чтобы посетитель увидел контент, а не ошибку.
+     * Ничего не сохраняет, поэтому не может перезаписать данные.
+     *
+     * В админке этот метод применять не следует: там сохранение настроек
+     * поверх дефолта привело бы к потере реальных настроек владельца.
+     */
+    public static function loadSafe(): self
+    {
+        try {
+            return self::load();
+        } catch (Throwable $e) {
+            Storage::log('site.json повреждён, показываем дефолтные настройки: ' . $e->getMessage());
+            return new self();
+        }
     }
 
     /**

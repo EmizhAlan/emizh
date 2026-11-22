@@ -59,8 +59,7 @@ final class Page
             (string) ($data['content'] ?? ''),
             isset($data['created']) ? (string) $data['created'] : null,
             isset($data['updated']) ? (string) $data['updated'] : null,
-            isset($data['showInNav']) ? (bool)$data['showInNav'] : true,
-            isset($data['showInNav']) ? (bool)$data['showInNav'] : true
+            isset($data['showInNav']) ? (bool) $data['showInNav'] : true
         );
     }
 
@@ -187,13 +186,19 @@ final class Page
 
             $slug = substr($file, 0, -5); // убираем .json
 
+            if (!self::isValidSlug($slug)) {
+                Storage::log('Страница пропущена: некорректное имя файла "pages/' . $file . '"');
+                continue;
+            }
+
             try {
                 $page = self::load($slug);
                 if ($page !== null) {
                     $pages[$slug] = $page;
                 }
-            } catch (RuntimeException | InvalidArgumentException) {
-                // Пропускаем битый файл, продолжаем
+            } catch (RuntimeException | InvalidArgumentException $e) {
+                // Битый файл не должен ломать весь сайт — пропускаем его с записью в лог
+                Storage::log('Страница пропущена: pages/' . $file . ' — ' . $e->getMessage());
                 continue;
             }
         }

@@ -7,6 +7,14 @@
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-11-21
+
+### Исправлено
+- Поведение при повреждённом `site.json` — читатель видит сайт, ошибка записана в лог (добавлен `Site::loadSafe()`)
+- Поведение при повреждённой странице — читатель не ломается, ошибка записана в лог (`Page::loadAll()` с валидацией слагов и логированием)
+- PHP-ошибки больше не видны посетителям — все ошибки пишутся в лог-файл рядом с `data/` (`bootstrap.php`: `display_errors = 0`, глобальные обработчики исключений, фатальных ошибок и предупреждений)
+- Удалён дублирующийся аргумент `showInNav` в `Page::fromArray()`
+
 ## [0.4.0] — 2026-10-25
 
 ### Блок 3: Управление страницами — закрыт
@@ -59,7 +67,8 @@
 ### Добавлено
 - Первый рабочий каркас
 
-[Unreleased]: https://github.com/EmizhAlan/emizh/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/EmizhAlan/emizh/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.1
 [0.4.0]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.0
 [0.3.0]: https://github.com/EmizhAlan/emizh/releases/tag/v0.3.0
 [0.2.0]: https://github.com/EmizhAlan/emizh/releases/tag/v0.2.0
