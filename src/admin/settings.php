@@ -59,15 +59,10 @@ if (isPost()) {
 <body class="admin-body">
 <div class="admin-container admin-container-wide">
     <div class="admin-topbar">
-        <div class="admin-topbar-title"><a href="dashboard.php" class="admin-back">← Панель управления</a></div>
+        <div class="admin-topbar-title"><?= adminBack('dashboard.php') ?></div>
     </div>
 
-    <?php if ($flashError !== null): ?>
-        <div class="admin-alert admin-alert-error"><?= htmlspecialchars((string)$flashError, ENT_QUOTES, 'UTF-8') ?></div>
-    <?php endif; ?>
-    <?php if ($flashSuccess !== null): ?>
-        <div class="admin-alert admin-alert-success"><?= htmlspecialchars((string)$flashSuccess, ENT_QUOTES, 'UTF-8') ?></div>
-    <?php endif; ?>
+    <?= adminFlash() ?>
 
     <div class="admin-card">
         <h1 class="admin-title" style="margin-bottom: 24px;">Настройки сайта</h1>
@@ -135,5 +130,8 @@ if (isPost()) {
         </form>
     </div>
 </div>
+
+<script src="../assets/admin-ui.js"></script>
+
 </body>
 </html>

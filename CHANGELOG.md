@@ -7,6 +7,17 @@
 
 ## [Unreleased]
 
+## [0.4.3] — 2026-11-22
+
+### Улучшено
+- **Единый компонент flash-сообщений.** Функция `adminFlash()` в `_init.php` заменяет 10 дублирующих блоков `if ($flashError)`. Ошибки и успехи теперь выводятся в едином стиле с иконкой закрытия `✕`.
+- **Авто-скрытие success-уведомлений.** Блоки с классом `.admin-alert-autohide` плавно исчезают через 4 секунды. Ошибки остаются до ручного закрытия.
+- **Анимация появления и исчезновения.** `@keyframes admin-slide-down` и `admin-slide-up` в `admin.css`.
+- **Умная кнопка «Назад».** Функция `adminBack()` в `_init.php` читает `HTTP_REFERER` и возвращает ссылку на предыдущую страницу админки. Текст меняется на `← Назад` при внутреннем реферере.
+- **Flash-сообщения там, где их не было.** `toggle_nav.php` — «Страница показана/скрыта из меню». `reorder.php` — «Порядок страниц обновлён» при перемещении стрелками вверх/вниз.
+- **Flash-блоки в `delete.php`.** Ошибки валидации и редиректа теперь отображаются на странице подтверждения.
+- **Добавлен `assets/admin-ui.js`.** JS-модуль для авто-скрытия и ручного закрытия alert-блоков.
+
 ## [0.4.2] — 2026-11-22
 
 ### Улучшено
@@ -78,9 +89,9 @@
 ### Добавлено
 - Первый рабочий каркас
 
-[Unreleased]: https://github.com/EmizhAlan/emizh/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/EmizhAlan/emizh/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.3
 [0.4.2]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.2
-[0.4.1]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.1
 [0.4.0]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.0
 [0.3.0]: https://github.com/EmizhAlan/emizh/releases/tag/v0.3.0
 [0.2.0]: https://github.com/EmizhAlan/emizh/releases/tag/v0.2.0

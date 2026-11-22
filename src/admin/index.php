@@ -45,13 +45,7 @@ if (!empty($_SESSION['_rate_hint']['until'])) {
         </div>
     <?php endif; ?>
 
-    <?php if ($flashError !== null): ?>
-        <div class="admin-alert admin-alert-error"><?= htmlspecialchars((string)$flashError, ENT_QUOTES, 'UTF-8') ?></div>
-    <?php endif; ?>
-
-    <?php if ($flashSuccess !== null): ?>
-        <div class="admin-alert admin-alert-success"><?= htmlspecialchars((string)$flashSuccess, ENT_QUOTES, 'UTF-8') ?></div>
-    <?php endif; ?>
+    <?= adminFlash() ?>
 
         <?php if ($ownerBroken): ?>
 
@@ -167,6 +161,8 @@ if (!empty($_SESSION['_rate_hint']['until'])) {
     </div>
 
 </div>
+
+<script src="../assets/admin-ui.js"></script>
 
 </body>
 </html>

@@ -29,16 +29,14 @@ $site = Site::load();
 
     <div class="admin-topbar">
         <div class="admin-topbar-title">
-            <a href="dashboard.php" class="admin-back">← Панель управления</a>
+            <?= adminBack('dashboard.php') ?>
         </div>
         <div class="admin-topbar-user">
             <?= htmlspecialchars((string)$username, ENT_QUOTES, 'UTF-8') ?>
         </div>
     </div>
 
-    <?php if ($flashError !== null): ?>
-        <div class="admin-alert admin-alert-error"><?= htmlspecialchars((string)$flashError, ENT_QUOTES, 'UTF-8') ?></div>
-    <?php endif; ?>
+    <?= adminFlash() ?>
 
     <div class="admin-card">
         <div class="admin-card-header">
@@ -119,6 +117,7 @@ $site = Site::load();
 
 <script src="../assets/admin-editor.js"></script>
 <script src="../assets/admin-slug.js"></script>
+<script src="../assets/admin-ui.js"></script>
 <script>
 // Автогенерация слага из заголовка (логика — в assets/admin-slug.js)
 EmizhSlug.bind(

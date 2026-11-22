@@ -20,6 +20,9 @@ if ($page) {
     // Переключаем туда-сюда
     $page->setShowInNav(!$page->showInNav());
     $page->save();
+
+    $actionText = $page->showInNav() ? 'показана в меню' : 'скрыта из меню';
+    $_SESSION['flash_success'] = 'Страница «' . $page->title() . '» ' . $actionText . '.';
 }
 
 adminRedirect('dashboard.php');

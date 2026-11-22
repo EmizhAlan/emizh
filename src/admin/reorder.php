@@ -46,6 +46,7 @@ if ($action === 'up') {
         $order[$index] = $temp;
         $site->setPageOrder($order);
         $site->save();
+        $_SESSION['flash_success'] = 'Порядок страниц обновлён.';
     }
 } elseif ($action === 'down') {
     if ($index < count($order) - 1) {
@@ -55,6 +56,7 @@ if ($action === 'up') {
         $order[$index] = $temp;
         $site->setPageOrder($order);
         $site->save();
+        $_SESSION['flash_success'] = 'Порядок страниц обновлён.';
     }
 } elseif ($action === 'make_home') {
     $site->setHomePage($slug);

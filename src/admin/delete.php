@@ -62,6 +62,9 @@ if (isPost()) {
 // ---- GET: показываем страницу подтверждения ----
 $isHome = ($slug === $site->homePage());
 
+// URL возврата (для кнопки «Отмена») — используем ту же логику, что и adminBack()
+$backUrl = adminBackUrl('dashboard.php');
+
 ?><!DOCTYPE html>
 <html lang="ru" data-theme="light">
 <head>
@@ -75,6 +78,12 @@ $isHome = ($slug === $site->homePage());
 
 <div class="admin-container">
 
+    <div class="admin-topbar">
+        <div class="admin-topbar-title">
+            <?= adminBack('dashboard.php') ?>
+        </div>
+    </div>
+
     <div class="admin-card">
         <h1 class="admin-title">Удалить страницу?</h1>
         <p class="admin-subtitle">
@@ -82,6 +91,8 @@ $isHome = ($slug === $site->homePage());
             (адрес <code>/<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?></code>)
             будет удалена навсегда.
         </p>
+
+        <?= adminFlash() ?>
 
         <?php if ($isHome): ?>
             <div class="admin-alert admin-alert-error">
@@ -96,7 +107,7 @@ $isHome = ($slug === $site->homePage());
             <?= csrfField() ?>
             <input type="hidden" name="slug" value="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
 
-            <a href="dashboard.php" class="admin-btn admin-btn-secondary">Отмена</a>
+            <a href="<?= htmlspecialchars($backUrl, ENT_QUOTES, 'UTF-8') ?>" class="admin-btn admin-btn-secondary">Отмена</a>
             <button type="submit" class="admin-btn admin-btn-danger">Удалить навсегда</button>
         </form>
     </div>
@@ -106,6 +117,8 @@ $isHome = ($slug === $site->homePage());
     </div>
 
 </div>
+
+<script src="../assets/admin-ui.js"></script>
 
 </body>
 </html>
