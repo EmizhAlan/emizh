@@ -47,7 +47,12 @@ $username = Auth::currentUser();
             Вы отвечаете за сохранность своих данных.
         </div>
 
-        <form method="post" action="update_save.php" enctype="multipart/form-data" class="admin-form">
+        <form method="post" action="update_save.php" enctype="multipart/form-data" class="admin-form"
+              data-confirm="#admin-confirm-modal"
+              data-confirm-title="Обновление системы"
+              data-confirm-message="Загруженный архив перезапишет файлы системы. Перед обновлением обязательно сделайте резервную копию папки data/ и файла owner.json."
+              data-confirm-warning="Это действие перезапишет все файлы системы. Убедитесь, что у вас есть резервная копия."
+              data-confirm-submit="Обновить и перезаписать">
             <?= csrfField() ?>
 
             <label class="admin-label">
@@ -70,6 +75,26 @@ $username = Auth::currentUser();
         emizh <?= htmlspecialchars(Version::current(), ENT_QUOTES, 'UTF-8') ?>
     </div>
 
+</div>
+
+<!-- Модалка подтверждения обновления -->
+<div class="admin-modal" id="admin-confirm-modal" hidden role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <div class="admin-modal-dialog">
+        <h2 class="admin-modal-title" id="admin-confirm-title">Обновление системы</h2>
+        <div class="admin-modal-body">
+            <p data-confirm-message></p>
+            <div class="admin-alert admin-alert-error" data-confirm-warning hidden></div>
+        </div>
+        <form method="post" action="update_save.php" enctype="multipart/form-data" data-confirm-form>
+            <?= csrfField() ?>
+            <input type="hidden" name="archive" value="">
+            <div class="admin-modal-actions">
+                <button type="button" class="admin-btn admin-btn-secondary" data-modal-close>Отмена</button>
+                <button type="button" class="admin-btn admin-btn-danger" data-confirm-submit-btn>Обновить и перезаписать</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script src="../assets/admin-ui.js"></script>

@@ -7,6 +7,20 @@
 
 ## [Unreleased]
 
+## [0.4.4] — 2026-11-25
+
+### Добавлено
+- **Модальное окно подтверждения `EmizhConfirm`.** Универсальный компонент в `admin-ui.js` для опасных действий. Работает в двух режимах: ссылка-триггер (удаление страницы) и форма-триггер (обновление системы). Query-параметры автоматически переносятся в поля формы модалки.
+- **Focus trap** внутри диалога: Tab не выходит за пределы модалки, Esc закрывает, клик по backdrop закрывает, возврат фокуса на триггер.
+- **Блокировка прокрутки body** при открытом окне.
+- **Анимации появления/исчезновения** (`admin-modal-fade`, `admin-modal-pop`).
+- **Graceful degradation**: без JS ссылка «Удалить» ведёт на `delete.php` как раньше; форма модалки содержит валидный CSRF.
+
+### Изменено
+- **`dashboard.php`**: кнопка «Удалить» стала красной (`admin-btn-danger`) и открывает модалку вместо перехода на страницу.
+- **`update.php`**: форма обновления теперь запрашивает подтверждение через модалку.
+- **`admin.css`**: добавлен блок модальных окон с мобильной адаптацией.
+
 ## [0.4.3] — 2026-11-22
 
 ### Улучшено
@@ -89,7 +103,8 @@
 ### Добавлено
 - Первый рабочий каркас
 
-[Unreleased]: https://github.com/EmizhAlan/emizh/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/EmizhAlan/emizh/compare/v0.4.4...HEAD
+[0.4.4]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.4
 [0.4.3]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.3
 [0.4.2]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.2
 [0.4.0]: https://github.com/EmizhAlan/emizh/releases/tag/v0.4.0

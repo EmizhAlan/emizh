@@ -134,7 +134,13 @@ $pages = $site->pages(); // ['slug' => Page]
 
                                     <!-- Редактировать и удалить -->
                                     <a href="edit.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Редактировать</a>
-                                    <a href="delete.php?slug=<?= urlencode($slug) ?>" class="admin-btn admin-btn-small admin-btn-secondary">Удалить</a>
+                                    <a href="delete.php?slug=<?= urlencode($slug) ?>"
+                                       class="admin-btn admin-btn-small admin-btn-danger"
+                                       data-confirm="#admin-confirm-modal"
+                                       data-confirm-title="Удалить страницу?"
+                                       data-confirm-message="Страница «<?= htmlspecialchars($page->title(), ENT_QUOTES, 'UTF-8') ?>» (адрес /<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>) будет удалена навсегда. Действие нельзя отменить."
+                                       <?= $isHome ? 'data-confirm-warning="Это главная страница сайта. После удаления главной станет другая страница (если они есть)."' : '' ?>
+                                       data-confirm-submit="Удалить навсегда">Удалить</a>
                                     <!-- Добавь это рядом с кнопкой "Сделать главной" -->
                                     <form method="post" action="toggle_nav.php" class="admin-order-form">
                                         <?= csrfField() ?>
@@ -157,6 +163,26 @@ $pages = $site->pages(); // ['slug' => Page]
         emizh <?= htmlspecialchars(Version::current(), ENT_QUOTES, 'UTF-8') ?>
     </div>
 
+</div>
+
+<!-- Модалка подтверждения удаления -->
+<div class="admin-modal" id="admin-confirm-modal" hidden role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <div class="admin-modal-dialog">
+        <h2 class="admin-modal-title" id="admin-confirm-title">Удалить страницу?</h2>
+        <div class="admin-modal-body">
+            <p data-confirm-message></p>
+            <div class="admin-alert admin-alert-error" data-confirm-warning hidden></div>
+        </div>
+        <form method="post" action="delete.php" data-confirm-form>
+            <?= csrfField() ?>
+            <input type="hidden" name="slug" value="">
+            <div class="admin-modal-actions">
+                <button type="button" class="admin-btn admin-btn-secondary" data-modal-close>Отмена</button>
+                <button type="button" class="admin-btn admin-btn-danger" data-confirm-submit-btn>Удалить навсегда</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script src="../assets/admin-ui.js"></script>
